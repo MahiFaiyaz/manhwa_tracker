@@ -18,10 +18,10 @@ class _HomeViewState extends State<HomeView> {
 
   bool isLoading = true;
 
-  String? selectedGenre;
-  String? selectedCategory;
-  String? selectedStatus;
-  String? selectedRating;
+  List<String> selectedGenres = [];
+  List<String> selectedCategories = [];
+  List<String> selectedStatuses = [];
+  List<String> selectedRatings = [];
 
   @override
   void initState() {
@@ -65,36 +65,59 @@ class _HomeViewState extends State<HomeView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FilterDropdown(
-            label: 'Genre',
-            value: selectedGenre,
-            items: genres.map((g) => g['name'] as String).toList(),
-            onChanged: (val) => setState(() => selectedGenre = val),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              'Genres',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
           ),
-          // You can repeat similar mock fetch + FilterDropdown logic for Category, Rating, Status
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children:
+                genres.map((genre) {
+                  final name = genre['name'] as String;
+                  final isSelected = selectedGenres.contains(name);
+                  return FilterChip(
+                    label: Text(name),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        if (selected) {
+                          selectedGenres.add(name);
+                        } else {
+                          selectedGenres.remove(name);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+          ),
           const SizedBox(height: 24),
-          FilterDropdown(
-            label: 'Category',
-            value: selectedCategory,
-            items: categories.map((g) => g['name'] as String).toList(),
-            onChanged: (val) => setState(() => selectedCategory = val),
-          ),
-          // You can repeat similar mock fetch + FilterDropdown logic for Category, Rating, Status
-          const SizedBox(height: 24),
-          FilterDropdown(
-            label: 'Rating',
-            value: selectedRating,
-            items: ratings.map((g) => g['name'] as String).toList(),
-            onChanged: (val) => setState(() => selectedRating = val),
-          ),
-          // You can repeat similar mock fetch + FilterDropdown logic for Category, Rating, Status
-          const SizedBox(height: 24),
-          FilterDropdown(
-            label: 'Status',
-            value: selectedStatus,
-            items: status.map((g) => g['name'] as String).toList(),
-            onChanged: (val) => setState(() => selectedStatus = val),
-          ),
+          // FilterDropdown(
+          //   label: 'Category',
+          //   value: selectedCategory,
+          //   items: categories.map((g) => g['name'] as String).toList(),
+          //   onChanged: (val) => setState(() => selectedCategory = val),
+          // ),
+          // // You can repeat similar mock fetch + FilterDropdown logic for Category, Rating, Status
+          // const SizedBox(height: 24),
+          // FilterDropdown(
+          //   label: 'Rating',
+          //   value: selectedRating,
+          //   items: ratings.map((g) => g['name'] as String).toList(),
+          //   onChanged: (val) => setState(() => selectedRating = val),
+          // ),
+          // // You can repeat similar mock fetch + FilterDropdown logic for Category, Rating, Status
+          // const SizedBox(height: 24),
+          // FilterDropdown(
+          //   label: 'Status',
+          //   value: selectedStatus,
+          //   items: status.map((g) => g['name'] as String).toList(),
+          //   onChanged: (val) => setState(() => selectedStatus = val),
+          // ),
           // You can repeat similar mock fetch + FilterDropdown logic for Category, Rating, Status
           const SizedBox(height: 24),
           ElevatedButton(
