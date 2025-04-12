@@ -1,0 +1,98 @@
+[
+    {
+        "name": "Action",
+        "description": "Stories driven by intense physical activity, battles, or dangerous scenarios. The protagonist often faces high-stakes challenges involving combat, survival, or conflict resolution."
+    },
+    {
+        "name": "Adventure",
+        "description": "Focuses on exploring new worlds, uncovering mysteries, or embarking on epic journeys. Adventure stories often include a sense of wonder and discovery."
+    },
+    {
+        "name": "Comedy",
+        "description": "Lighthearted tales filled with humor, playful characters, and exaggerated scenarios. The goal is to entertain and amuse readers."
+    },
+    {
+        "name": "Drama",
+        "description": "Emotionally intense stories that focus on character relationships, struggles, and development. Often revolves around realistic or relatable conflicts."
+    },
+    {
+        "name": "Fantasy",
+        "description": "Set in imaginative worlds with magical elements, mythical creatures, and epic quests. These stories often explore the boundaries of creativity."
+    },
+    {
+        "name": "Gender Bender",
+        "description": "Involves characters experiencing a change in gender, whether through transformation, disguise, or identity shift, leading to unique challenges or humorous situations."
+    },
+    {
+        "name": "Harem",
+        "description": "A protagonist is surrounded by multiple characters vying for their affection, often leading to romantic or comedic situations."
+    },
+    {
+        "name": "Historical",
+        "description": "Stories set in past time periods, often reflecting cultural, political, or social aspects of that era."
+    },
+    {
+        "name": "Horror",
+        "description": "Designed to evoke fear or suspense, these stories often involve supernatural elements, grotesque creatures, or psychological terror."
+    },
+    {
+        "name": "Josei",
+        "description": "Aimed at adult women, focusing on mature themes such as relationships, careers, and personal growth."
+    },
+    {
+        "name": "Martial Arts",
+        "description": "Emphasizes combat techniques, training, and philosophies associated with martial disciplines."
+    },
+    {
+        "name": "Mystery",
+        "description": "Revolves around solving puzzles, uncovering secrets, or investigating crimes, often with twists and turns."
+    },
+    {
+        "name": "Psychological",
+        "description": "Explores the inner workings of the human mind, focusing on mental conflicts, motivations, and moral dilemmas."
+    },
+    {
+        "name": "Romance",
+        "description": "Centers around love stories and relationships, exploring emotional connections between characters."
+    },
+    {
+        "name": "School Life",
+        "description": "Focuses on daily life in school settings, often involving friendships, rivalries, and youthful experiences."
+    },
+    {
+        "name": "Sci-fi",
+        "description": "Features futuristic technology, space exploration, or speculative science-based worlds."
+    },
+    {
+        "name": "Seinen",
+        "description": "Aimed at adult male audiences, offering mature storytelling with darker themes."
+    },
+    {
+        "name": "Shoujo",
+        "description": "Targeted at young female audiences, emphasizing romance, emotions, and personal growth."
+    },
+    {
+        "name": "Shounen",
+        "description": "Aimed at young male audiences, featuring action-packed adventures and character growth."
+    },
+    {
+        "name": "Slice of Life",
+        "description": "Depicts ordinary life in a realistic manner, focusing on relatable and heartfelt moments."
+    },
+    {
+        "name": "Sports",
+        "description": "Revolves around athletics, teamwork, and the challenges of sportsmanship."
+    },
+    {
+        "name": "Supernatural",
+        "description": "Features elements beyond the natural world, such as spirits, ghosts, or mystical powers."
+    },
+    {
+        "name": "Thriller",
+        "description": "High-stakes, suspenseful narratives that keep readers on edge, often with twists and dangers."
+    },
+    {
+        "name": "Tragedy",
+        "description": "Highlights sorrow, loss, or downfall, delivering an emotionally impactful narrative."
+    }
+]

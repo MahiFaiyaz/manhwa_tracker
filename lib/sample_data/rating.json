@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Highly Recommended",
+        "description": "Series I personally consider a must read for everyone. This group mainly consists of my favorites"
+    },
+    {
+        "name": "Recommended",
+        "description": "Falls short for a bit compared to Highly Recommended rating, but series under this rating are still very solid"
+    },
+    {
+        "name": "Good",
+        "description": "Balancing itself to keep steady or fell deep down. Usually a step away from being really good or really bad"
+    },
+    {
+        "name": "Decent",
+        "description": "I consider these junk foods. You're getting temporary enjoyment in exchange for long lasting brain rot addiction. Pick your poison"
+    },
+    {
+        "name": "Meh",
+        "description": "Exists for one of three reasons: started out good but fell off hard, good concept but horrible execution, overall disaster, or just my personal feelings involved. Wait, thats four"
+    },
+    {
+        "name": "N/A",
+        "description": "No rating and review yet if the series has less than 50 chapters"
+    }
+]

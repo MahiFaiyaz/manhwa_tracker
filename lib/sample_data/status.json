@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Complete",
+        "description": "Completed series with English translation, official or not doesn't matter as long as the series is completed with English fully translated."
+    },
+    {
+        "name": "Ongoing",
+        "description": "Series that have a running English translation. If the English translation stopped but the raws is still ongoing, it's going to fall under the Unknown status."
+    },
+    {
+        "name": "Hiatus",
+        "description": "Series currently on break. Typically for reasons like:\n-- Season end or break\n-- Author or artist health break"
+    },
+    {
+        "name": "Axed",
+        "description": "Series who unfortunately got hit by Kratos. Either the raws got:\n-- Cancelled\n-- Discontinued"
+    },
+    {
+        "name": "Unknown",
+        "description": "English translation are stopped for various reasons like:\n-- Scanlator/s dropped the series for reasons\n-- No updates for atleast 6 months from the scanlator\n-- No new group have picked up the series\n-- DMCA strike"
+    }
+]
