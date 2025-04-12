@@ -5,14 +5,10 @@ class ResultPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.sizeOf(context).height;
 
-    return Container(
+    return SizedBox(
       height: height * 0.83, // almost full screen
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
       child: Column(
         children: [
           Expanded(
