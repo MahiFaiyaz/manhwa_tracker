@@ -68,8 +68,6 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final double buttonWidth = (MediaQuery.sizeOf(context).width * 0.5);
-
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -121,7 +119,7 @@ class _HomeViewState extends State<HomeView> {
           ElevatedButton(
             onPressed: _showResults,
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(buttonWidth, 50),
+              minimumSize: Size((MediaQuery.sizeOf(context).width * 0.5), 50),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

@@ -146,6 +146,29 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
                 },
               ),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size((MediaQuery.sizeOf(context).width * 0.5), 50),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                backgroundColor: Colors.grey[700],
+              ),
+
+              child: const Text(
+                "Done",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
