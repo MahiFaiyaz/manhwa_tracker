@@ -71,3 +71,10 @@ class Manhwa {
     },
   };
 }
+
+class ManhwaFetchResult {
+  final List<Manhwa> manhwas;
+  final bool fromFallback;
+
+  ManhwaFetchResult({required this.manhwas, this.fromFallback = false});
+}

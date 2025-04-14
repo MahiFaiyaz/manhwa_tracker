@@ -107,7 +107,7 @@ Future<List<Rating>> fetchRatings({void Function(String)? onFallback}) async {
   }
 }
 
-Future<List<Manhwa>> fetchManhwas({
+Future<ManhwaFetchResult> fetchManhwas({
   required ManhwaFilter filter,
   void Function(String)? onFallback,
 }) async {
@@ -119,23 +119,27 @@ Future<List<Manhwa>> fetchManhwas({
         // 'auth-token': 'your_token_here', // optional
       },
       body: jsonEncode(filter.toJson()),
+          debugPrint("Sending POST to $uri");
+    debugPrint("Headers: $headers");
+    debugPrint("Body: $body");
     );
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Manhwa.fromJson(json)).toList();
+      final manhwas = data.map((json) => Manhwa.fromJson(json)).toList();
+      return ManhwaFetchResult(manhwas: manhwas);
     } else {
-      throw Exception('status ${response.statusCode}');
+      throw Exception('Bad status code: ${response.statusCode}');
     }
   } catch (e) {
     debugPrint("Manhwa fetch failed: $e");
 
     if (onFallback != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        onFallback("Failed to load manhwas. Please try again later.");
+        onFallback.call("Failed to load manhwas. Please try again later.");
       });
     }
 
-    return []; // fallback to empty list, or load mock if desired
+    return ManhwaFetchResult(manhwas: [], fromFallback: true);
   }
 }
