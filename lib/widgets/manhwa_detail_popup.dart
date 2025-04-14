@@ -81,6 +81,7 @@ class ManhwaDetailPopup extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           _chip("Rating: $rating", dark: true),
+                          const SizedBox(height: 4), // spacing here
                           _chip("Status: $status", dark: true),
                         ],
                       ),
@@ -92,9 +93,10 @@ class ManhwaDetailPopup extends StatelessWidget {
                   "Genres:",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 8),
                 Wrap(
                   spacing: 4,
-                  runSpacing: 0,
+                  runSpacing: 4,
                   children: genres.map(_chip).toList(),
                 ),
                 const SizedBox(height: 12),
@@ -102,9 +104,10 @@ class ManhwaDetailPopup extends StatelessWidget {
                   "Categories:",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 8),
                 Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
+                  spacing: 4,
+                  runSpacing: 4,
                   children: categories.map(_chip).toList(),
                 ),
                 const SizedBox(height: 16),
@@ -112,6 +115,7 @@ class ManhwaDetailPopup extends StatelessWidget {
                   "Synopsis:",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 8),
                 Text(synopsis, style: const TextStyle(fontSize: 14)),
                 const SizedBox(height: 32),
               ],
@@ -124,6 +128,9 @@ class ManhwaDetailPopup extends StatelessWidget {
 
   Widget _chip(String label, {bool dark = false}) {
     return Chip(
+      padding: EdgeInsets.zero,
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       label: Text(
         label,
         style: TextStyle(
