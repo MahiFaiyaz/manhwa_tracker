@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/result_popup.dart';
 import '../services/api_services.dart';
 import '../widgets/multi_select_dropdown.dart';
+import '../models/models.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -11,10 +12,10 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List<Map<String, dynamic>> genres = [];
-  List<Map<String, dynamic>> categories = [];
-  List<Map<String, dynamic>> status = [];
-  List<Map<String, dynamic>> ratings = [];
+  List<Genre> genres = [];
+  List<Category> categories = [];
+  List<Status> status = [];
+  List<Rating> ratings = [];
 
   bool isLoading = true;
   List<String> selectedGenres = [];
@@ -36,11 +37,16 @@ class _HomeViewState extends State<HomeView> {
       fetchRatings(),
     ]);
 
+    final List<Genre> fetchedGenres = results[0] as List<Genre>;
+    final List<Category> fetchedCategories = results[1] as List<Category>;
+    final List<Status> fetchedStatus = results[2] as List<Status>;
+    final List<Rating> fetchedRatings = results[3] as List<Rating>;
+
     setState(() {
-      genres = results[0];
-      categories = results[1];
-      status = results[2];
-      ratings = results[3];
+      genres = fetchedGenres;
+      categories = fetchedCategories;
+      status = fetchedStatus;
+      ratings = fetchedRatings;
       isLoading = false;
     });
   }
@@ -75,7 +81,7 @@ class _HomeViewState extends State<HomeView> {
         children: [
           MultiSelectDropdown(
             label: 'Genres',
-            items: genres.map((g) => g['name'] as String).toList(),
+            items: genres.map((g) => g.name).toList(),
             selectedItems: selectedGenres,
             onSelectionChanged: (values) {
               setState(() => selectedGenres = values);
@@ -85,7 +91,7 @@ class _HomeViewState extends State<HomeView> {
 
           MultiSelectDropdown(
             label: 'Categories',
-            items: categories.map((c) => c['name'] as String).toList(),
+            items: categories.map((c) => c.name).toList(),
             selectedItems: selectedCategories,
             onSelectionChanged: (values) {
               setState(() => selectedCategories = values);
@@ -95,7 +101,7 @@ class _HomeViewState extends State<HomeView> {
 
           MultiSelectDropdown(
             label: 'Ratings',
-            items: ratings.map((r) => r['name'] as String).toList(),
+            items: ratings.map((r) => r.name).toList(),
             selectedItems: selectedRatings,
             onSelectionChanged: (values) {
               setState(() => selectedRatings = values);
@@ -105,7 +111,7 @@ class _HomeViewState extends State<HomeView> {
 
           MultiSelectDropdown(
             label: 'Status',
-            items: status.map((s) => s['name'] as String).toList(),
+            items: status.map((s) => s.name).toList(),
             selectedItems: selectedStatus,
             onSelectionChanged: (values) {
               setState(() => selectedStatus = values);
