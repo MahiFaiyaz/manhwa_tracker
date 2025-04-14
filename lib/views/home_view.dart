@@ -3,6 +3,7 @@ import '../widgets/result_popup.dart';
 import '../services/api_services.dart';
 import '../widgets/multi_select_dropdown.dart';
 import '../models/models.dart';
+import '../models/manhwa_filter.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -72,19 +73,54 @@ class _HomeViewState extends State<HomeView> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _showResults() {
-    showModalBottomSheet(
+  void _showResults() async {
+    showDialog(
+      // optional loading indicator
       context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder:
-          (context) => ResultPopup(
-            genres: selectedGenres,
-            categories: selectedCategories,
-            status: selectedStatus,
-            ratings: selectedRatings,
-          ),
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
     );
+
+    try {
+      final result = await fetchManhwas(
+        filter: ManhwaFilter(
+          genres: selectedGenres,
+          categories: selectedCategories,
+          status: selectedStatus,
+          ratings: selectedRatings,
+          minChapters: 1,
+          maxChapters: 200,
+          minYearReleased: 2000,
+          maxYearReleased: 2025,
+        ),
+        onFallback: _showSnackBar,
+      );
+
+      if (!mounted) return;
+
+      Navigator.pop(context); // remove loading spinner
+
+      if (result.manhwas.isEmpty && !result.fromFallback) {
+        _showSnackBar("No results found.");
+        return;
+      }
+
+      if (result.manhwas.isEmpty && result.fromFallback) {
+        // Already showed fallback message inside fetch
+        return;
+      }
+
+      showModalBottomSheet(
+        context: context,
+        showDragHandle: true,
+        isScrollControlled: true,
+        builder: (_) => ResultPopup(manhwas: result.manhwas),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context); // remove loading spinner
+      _showSnackBar("Failed to load results: $e");
+    }
   }
 
   @override
