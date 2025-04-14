@@ -51,9 +51,7 @@ class ManhwaDetailPopup extends StatelessWidget {
                       bottom: 0,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(
-                            0.6,
-                          ), // subtle dark overlay
+                          color: Colors.black54, // subtle dark overlay
                           borderRadius: BorderRadius.vertical(
                             bottom: Radius.circular(12),
                           ),
