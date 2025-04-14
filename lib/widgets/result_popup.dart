@@ -65,10 +65,7 @@ class ResultPopup extends StatelessWidget {
               ),
               itemBuilder: (context, index) {
                 final manhwa = manhwas[index]["manhwa"];
-                return ManhwaCard(
-                  title: manhwa["name"] ?? "",
-                  imageUrl: manhwa["image_url"] ?? "",
-                );
+                return ManhwaCard(manhwa: manhwa);
               },
             ),
           );
