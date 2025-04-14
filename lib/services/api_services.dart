@@ -4,6 +4,7 @@ import '../models/models.dart';
 import 'package:http/http.dart' as http;
 import '../utils/config.dart';
 import 'package:flutter/foundation.dart' as foundation;
+import 'package:flutter/widgets.dart';
 
 Future<List<Map<String, dynamic>>> loadMockData(String filename) async {
   await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
@@ -27,7 +28,9 @@ Future<List<Genre>> fetchGenres({void Function(String)? onFallback}) async {
     }
   } catch (e) {
     foundation.debugPrint("Genre API failed: $e — falling back to mock data.");
-    onFallback?.call("Genres loaded using fallback data");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onFallback?.call("Genres loaded using fallback data");
+    });
 
     final mockData = await loadMockData('genres');
     return mockData.map((json) => Genre.fromJson(json)).toList();
@@ -52,7 +55,9 @@ Future<List<Category>> fetchCategories({
     foundation.debugPrint(
       "Category API failed: $e — falling back to mock data.",
     );
-    onFallback?.call("Categories loaded using fallback data");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onFallback?.call("Categories loaded using fallback data");
+    });
 
     final mockData = await loadMockData('categories');
     return mockData.map((json) => Category.fromJson(json)).toList();
@@ -71,9 +76,11 @@ Future<List<Status>> fetchStatus({void Function(String)? onFallback}) async {
     }
   } catch (e) {
     foundation.debugPrint("Status API failed: $e — falling back to mock data.");
-    onFallback?.call("Statuses loaded using fallback data");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onFallback?.call("Statuses loaded using fallback data");
+    });
 
-    final mockData = await loadMockData('statuses');
+    final mockData = await loadMockData('status');
     return mockData.map((json) => Status.fromJson(json)).toList();
   }
 }
@@ -90,7 +97,9 @@ Future<List<Rating>> fetchRatings({void Function(String)? onFallback}) async {
     }
   } catch (e) {
     foundation.debugPrint("Rating API failed: $e — falling back to mock data.");
-    onFallback?.call("Ratings loaded using fallback data");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onFallback?.call("Ratings loaded using fallback data");
+    });
 
     final mockData = await loadMockData('ratings');
     return mockData.map((json) => Rating.fromJson(json)).toList();
