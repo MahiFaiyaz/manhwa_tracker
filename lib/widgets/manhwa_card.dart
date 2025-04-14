@@ -9,10 +9,10 @@ class ManhwaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = manhwa.name ?? "";
-    final imageUrl = manhwa.imageUrl ?? "";
-    final rating = manhwa.rating ?? "";
-    final status = manhwa.status ?? "";
+    final title = manhwa.name;
+    final imageUrl = manhwa.imageUrl;
+    final rating = manhwa.rating;
+    final status = manhwa.status;
 
     return GestureDetector(
       onTap: () {

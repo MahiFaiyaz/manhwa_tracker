@@ -13,8 +13,8 @@ class ManhwaDetailPopup extends StatelessWidget {
     final synopsis = manhwa.synopsis;
     final rating = manhwa.rating;
     final status = manhwa.status;
-    final genres = List<String>.from(manhwa.genres ?? []);
-    final categories = List<String>.from(manhwa.categories ?? []);
+    final genres = List<String>.from(manhwa.genres);
+    final categories = List<String>.from(manhwa.categories);
 
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.83,
