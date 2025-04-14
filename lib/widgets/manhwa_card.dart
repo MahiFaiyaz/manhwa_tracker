@@ -43,7 +43,12 @@ class ManhwaCard extends StatelessWidget {
               bottom: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                color: Colors.black.withOpacity(0.6), // subtle dark overlay
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6), // subtle dark overlay
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(12),
+                  ),
+                ),
                 child: Text(
                   title,
                   style: const TextStyle(
