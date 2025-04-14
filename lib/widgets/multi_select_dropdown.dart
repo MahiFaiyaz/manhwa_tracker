@@ -14,90 +14,25 @@ class MultiSelectDropdown extends StatelessWidget {
     required this.onSelectionChanged,
   });
 
-  void _showSelectionModal(BuildContext context) async {
+  void _showSelectionModal(BuildContext context) {
     List<String> tempSelected = [...selectedItems];
-    final height = MediaQuery.sizeOf(context).height;
 
-    final result = await showModalBottomSheet<List<String>>(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (context) {
-        return SizedBox(
-          height: height * 0.7, // almost full screen
-          child: StatefulBuilder(
-            builder: (context, setModalState) {
-              return Padding(
-                padding: EdgeInsets.only(left: 16, right: 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Center(
-                      child: Text(
-                        "Select $label",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: items.length,
-                        itemBuilder: (context, index) {
-                          final item = items[index];
-                          final isSelected = tempSelected.contains(item);
-
-                          return GestureDetector(
-                            onTap: () {
-                              setModalState(() {
-                                if (isSelected) {
-                                  tempSelected.remove(item);
-                                } else {
-                                  tempSelected.add(item);
-                                }
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 16,
-                              ),
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:
-                                    isSelected
-                                        ? Colors.purple[900]
-                                        : Colors.white,
-                              ),
-                              child: Text(
-                                item,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      isSelected ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+        return _MultiSelectModalContent(
+          label: label,
+          items: items,
+          tempSelected: tempSelected,
         );
       },
-    );
-
-    if (result != null) {
-      onSelectionChanged(result);
-    }
+    ).then((_) {
+      onSelectionChanged(
+        tempSelected,
+      ); // Always return whatever was last selected
+    });
   }
 
   @override
@@ -116,6 +51,88 @@ class MultiSelectDropdown extends StatelessWidget {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
           child: Text(displayText),
+        ),
+      ),
+    );
+  }
+}
+
+class _MultiSelectModalContent extends StatefulWidget {
+  final String label;
+  final List<String> items;
+  final List<String> tempSelected;
+
+  const _MultiSelectModalContent({
+    required this.label,
+    required this.items,
+    required this.tempSelected,
+  });
+
+  @override
+  State<_MultiSelectModalContent> createState() =>
+      _MultiSelectModalContentState();
+}
+
+class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.7,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                "Select ${widget.label}",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.items.length,
+                itemBuilder: (context, index) {
+                  final item = widget.items[index];
+                  final isSelected = widget.tempSelected.contains(item);
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (isSelected) {
+                          widget.tempSelected.remove(item);
+                        } else {
+                          widget.tempSelected.add(item);
+                        }
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: isSelected ? Colors.purple[900] : Colors.white,
+                      ),
+                      child: Text(
+                        item,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isSelected ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
