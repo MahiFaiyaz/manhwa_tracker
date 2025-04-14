@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:manhwa_tracker/services/api_services.dart';
+import 'package:manhwa_tracker/widgets/shimmer_card.dart';
 import 'manhwa_card.dart';
+import 'package:manhwa_tracker/services/api_services.dart';
 
 class ResultPopup extends StatelessWidget {
   const ResultPopup({super.key});
@@ -15,14 +16,31 @@ class ResultPopup extends StatelessWidget {
         future: fetchManhwas(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No results found."));
+            // ✨ Show shimmer placeholders
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: GridView.builder(
+                itemCount: 15,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 2 / 3,
+                ),
+                itemBuilder: (context, index) => buildShimmerCard(),
+              ),
+            );
           }
 
-          final manhwas = snapshot.data!;
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
+
+          final manhwas = snapshot.data ?? [];
+
+          if (manhwas.isEmpty) {
+            return const Center(child: Text("No results found."));
+          }
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
