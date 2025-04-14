@@ -19,10 +19,8 @@ class ResultPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-
     return SizedBox(
-      height: height * 0.83,
+      height: MediaQuery.sizeOf(context).height * 0.83,
       child: FutureBuilder<List<Map<String, dynamic>>>(
         future: fetchManhwas(),
         builder: (context, snapshot) {
