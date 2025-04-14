@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../utils/config.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/widgets.dart';
+import '../models/manhwa_filter.dart';
 
 Future<List<Map<String, dynamic>>> loadMockData(String filename) async {
   await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
@@ -106,7 +107,35 @@ Future<List<Rating>> fetchRatings({void Function(String)? onFallback}) async {
   }
 }
 
-Future<List<Manhwa>> fetchManhwas() async {
-  final data = await loadMockData('manhwas');
-  return data.map((json) => Manhwa.fromJson(json)).toList();
+Future<List<Manhwa>> fetchManhwas({
+  required ManhwaFilter filter,
+  void Function(String)? onFallback,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$apiBaseUrl/manhwas'),
+      headers: {
+        'Content-Type': 'application/json',
+        // 'auth-token': 'your_token_here', // optional
+      },
+      body: jsonEncode(filter.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Manhwa.fromJson(json)).toList();
+    } else {
+      throw Exception('status ${response.statusCode}');
+    }
+  } catch (e) {
+    debugPrint("Manhwa fetch failed: $e");
+
+    if (onFallback != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        onFallback("Failed to load manhwas. Please try again later.");
+      });
+    }
+
+    return []; // fallback to empty list, or load mock if desired
+  }
 }
