@@ -4,7 +4,18 @@ import 'manhwa_card.dart';
 import 'package:manhwa_tracker/services/api_services.dart';
 
 class ResultPopup extends StatelessWidget {
-  const ResultPopup({super.key});
+  final List<String> genres;
+  final List<String> categories;
+  final List<String> status;
+  final List<String> ratings;
+
+  const ResultPopup({
+    super.key,
+    required this.genres,
+    required this.categories,
+    required this.status,
+    required this.ratings,
+  });
 
   @override
   Widget build(BuildContext context) {
