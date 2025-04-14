@@ -17,13 +17,6 @@ Widget buildShimmerCard() {
             ),
           ),
         ),
-        // const SizedBox(height: 6),
-        // Container(
-        //   height: 12,
-        //   width: double.infinity,
-        //   color: Colors.white,
-        //   margin: const EdgeInsets.only(top: 4),
-        // ),
       ],
     ),
   );
