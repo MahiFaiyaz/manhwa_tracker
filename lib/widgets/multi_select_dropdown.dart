@@ -153,19 +153,15 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: Size((MediaQuery.sizeOf(context).width * 0.5), 50),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
+                padding: const EdgeInsets.symmetric(),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: Colors.grey[700],
               ),
-
               child: const Text(
                 "Done",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 32),
