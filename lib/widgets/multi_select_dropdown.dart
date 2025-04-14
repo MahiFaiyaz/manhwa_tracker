@@ -83,14 +83,28 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: Text(
-                "Select ${widget.label}",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Select ${widget.label}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      widget.tempSelected.clear();
+                    });
+                  },
+                  child: const Text(
+                    "Clear All",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Expanded(
