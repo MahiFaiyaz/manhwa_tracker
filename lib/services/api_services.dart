@@ -119,9 +119,6 @@ Future<ManhwaFetchResult> fetchManhwas({
         // 'auth-token': 'your_token_here', // optional
       },
       body: jsonEncode(filter.toJson()),
-          debugPrint("Sending POST to $uri");
-    debugPrint("Headers: $headers");
-    debugPrint("Body: $body");
     );
 
     if (response.statusCode == 200) {
