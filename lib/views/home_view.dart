@@ -19,7 +19,7 @@ class _HomeViewState extends State<HomeView> {
   bool isLoading = true;
   List<String> selectedGenres = [];
   List<String> selectedCategories = [];
-  List<String> selectedStatuses = [];
+  List<String> selectedStatus = [];
   List<String> selectedRatings = [];
 
   @override
@@ -50,8 +50,13 @@ class _HomeViewState extends State<HomeView> {
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      // backgroundColor: Colors.transparent,
-      builder: (context) => const ResultPopup(),
+      builder:
+          (context) => ResultPopup(
+            genres: selectedGenres,
+            categories: selectedCategories,
+            status: selectedStatus,
+            ratings: selectedRatings,
+          ),
     );
   }
 
@@ -101,9 +106,9 @@ class _HomeViewState extends State<HomeView> {
           MultiSelectDropdown(
             label: 'Status',
             items: status.map((s) => s['name'] as String).toList(),
-            selectedItems: selectedStatuses,
+            selectedItems: selectedStatus,
             onSelectionChanged: (values) {
-              setState(() => selectedStatuses = values);
+              setState(() => selectedStatus = values);
             },
           ),
           const SizedBox(height: 24),
