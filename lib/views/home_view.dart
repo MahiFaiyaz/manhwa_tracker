@@ -30,25 +30,46 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> _loadAllDropdownData() async {
-    final results = await Future.wait([
-      fetchGenres(),
-      fetchCategories(),
-      fetchStatus(),
-      fetchRatings(),
+    setState(() {
+      isLoading = true;
+    });
+
+    late List<Genre> loadedGenres;
+    late List<Category> loadedCategories;
+    late List<Status> loadedStatus;
+    late List<Rating> loadedRatings;
+
+    // Run all fetch calls in parallel
+    await Future.wait([
+      fetchGenres(
+        onFallback: _showSnackBar,
+      ).then((result) => loadedGenres = result),
+      fetchCategories(
+        onFallback: _showSnackBar,
+      ).then((result) => loadedCategories = result),
+      fetchStatus(
+        onFallback: _showSnackBar,
+      ).then((result) => loadedStatus = result),
+      fetchRatings(
+        onFallback: _showSnackBar,
+      ).then((result) => loadedRatings = result),
     ]);
 
-    final List<Genre> fetchedGenres = results[0] as List<Genre>;
-    final List<Category> fetchedCategories = results[1] as List<Category>;
-    final List<Status> fetchedStatus = results[2] as List<Status>;
-    final List<Rating> fetchedRatings = results[3] as List<Rating>;
+    if (!mounted) return;
 
     setState(() {
-      genres = fetchedGenres;
-      categories = fetchedCategories;
-      status = fetchedStatus;
-      ratings = fetchedRatings;
+      genres = loadedGenres;
+      categories = loadedCategories;
+      status = loadedStatus;
+      ratings = loadedRatings;
       isLoading = false;
     });
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _showResults() {
