@@ -32,4 +32,7 @@ Future<List<Rating>> fetchRatings() async {
   return data.map((json) => Rating.fromJson(json)).toList();
 }
 
-Future<List<Map<String, dynamic>>> fetchManhwas() => loadMockData('manhwas');
+Future<List<Manhwa>> fetchManhwas() async {
+  final data = await loadMockData('manhwas');
+  return data.map((json) => Manhwa.fromJson(json)).toList();
+}

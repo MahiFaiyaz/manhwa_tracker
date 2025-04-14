@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import '../models/manhwa.dart';
 
 class ManhwaDetailPopup extends StatelessWidget {
-  final Map<String, dynamic> manhwa;
+  final Manhwa manhwa;
 
   const ManhwaDetailPopup({super.key, required this.manhwa});
 
   @override
   Widget build(BuildContext context) {
-    final title = manhwa["name"];
-    final imageUrl = manhwa["image_url"].replaceFirst('.webp', 'l.webp');
-    final synopsis = manhwa["synopsis"];
-    final rating = manhwa["rating"];
-    final status = manhwa["status"];
-    final genres = List<String>.from(manhwa["genres"] ?? []);
-    final categories = List<String>.from(manhwa["categories"] ?? []);
+    final title = manhwa.name;
+    final imageUrl = manhwa.imageUrl.replaceFirst('.webp', 'l.webp');
+    final synopsis = manhwa.synopsis;
+    final rating = manhwa.rating;
+    final status = manhwa.status;
+    final genres = List<String>.from(manhwa.genres ?? []);
+    final categories = List<String>.from(manhwa.categories ?? []);
 
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.83,

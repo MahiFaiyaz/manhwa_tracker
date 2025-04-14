@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:manhwa_tracker/widgets/shimmer_card.dart';
 import 'manhwa_card.dart';
 import 'package:manhwa_tracker/services/api_services.dart';
+import '../models/manhwa.dart';
 
 class ResultPopup extends StatelessWidget {
   final List<String> genres;
@@ -21,7 +22,7 @@ class ResultPopup extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.83,
-      child: FutureBuilder<List<Map<String, dynamic>>>(
+      child: FutureBuilder<List<Manhwa>>(
         future: fetchManhwas(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -65,7 +66,7 @@ class ResultPopup extends StatelessWidget {
                   childAspectRatio: 2 / 3,
                 ),
                 itemBuilder: (context, index) {
-                  final manhwa = manhwas[index]["manhwa"];
+                  final manhwa = manhwas[index];
                   return ManhwaCard(manhwa: manhwa);
                 },
               ),

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:manhwa_tracker/widgets/manhwa_detail_popup.dart';
+import '../models/manhwa.dart';
 
 class ManhwaCard extends StatelessWidget {
-  final Map<String, dynamic> manhwa;
+  final Manhwa manhwa;
 
   const ManhwaCard({super.key, required this.manhwa});
 
   @override
   Widget build(BuildContext context) {
-    final title = manhwa["name"] ?? "";
-    final imageUrl = manhwa["image_url"] ?? "";
-    final rating = manhwa["rating"] ?? "";
-    final status = manhwa["status"] ?? "";
+    final title = manhwa.name ?? "";
+    final imageUrl = manhwa.imageUrl ?? "";
+    final rating = manhwa.rating ?? "";
+    final status = manhwa.status ?? "";
 
     return GestureDetector(
       onTap: () {
