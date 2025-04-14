@@ -19,98 +19,103 @@ class ManhwaDetailPopup extends StatelessWidget {
       height: MediaQuery.sizeOf(context).height * 0.83,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 2 / 3,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        errorBuilder:
-                            (context, error, stackTrace) => Container(
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.broken_image),
-                            ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(
-                          0.6,
-                        ), // subtle dark overlay
-                        borderRadius: BorderRadius.vertical(
-                          bottom: Radius.circular(12),
+        child: Scrollbar(
+          radius: const Radius.circular(8),
+          thickness: 4,
+          thumbVisibility: false,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 2 / 3,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder:
+                              (context, error, stackTrace) => Container(
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.broken_image),
+                              ),
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(
+                            0.6,
+                          ), // subtle dark overlay
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(12),
+                          ),
                         ),
-                        maxLines: 5,
-                        overflow: TextOverflow.ellipsis,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        _chip("Rating: $rating", dark: true),
-                        _chip("Status: $status", dark: true),
-                      ],
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          _chip("Rating: $rating", dark: true),
+                          _chip("Status: $status", dark: true),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                "Genres:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Wrap(
-                spacing: 4,
-                runSpacing: 0,
-                children: genres.map(_chip).toList(),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                "Categories:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: categories.map(_chip).toList(),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                "Synopsis:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(synopsis, style: const TextStyle(fontSize: 14)),
-              const SizedBox(height: 32),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Genres:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Wrap(
+                  spacing: 4,
+                  runSpacing: 0,
+                  children: genres.map(_chip).toList(),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Categories:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: categories.map(_chip).toList(),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Synopsis:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(synopsis, style: const TextStyle(fontSize: 14)),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),

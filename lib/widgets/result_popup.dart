@@ -51,20 +51,24 @@ class ResultPopup extends StatelessWidget {
             return const Center(child: Text("No results found."));
           }
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: GridView.builder(
-              itemCount: manhwas.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 2 / 3,
+          return Scrollbar(
+            radius: const Radius.circular(8),
+            thickness: 4,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: GridView.builder(
+                itemCount: manhwas.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 2 / 3,
+                ),
+                itemBuilder: (context, index) {
+                  final manhwa = manhwas[index]["manhwa"];
+                  return ManhwaCard(manhwa: manhwa);
+                },
               ),
-              itemBuilder: (context, index) {
-                final manhwa = manhwas[index]["manhwa"];
-                return ManhwaCard(manhwa: manhwa);
-              },
             ),
           );
         },
