@@ -29,16 +29,18 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> _loadAllDropdownData() async {
-    final fetchedGenres = await fetchGenres();
-    final fetchedCategories = await fetchCategories();
-    final fetchedStatus = await fetchStatus();
-    final fetchedRatings = await fetchRatings();
+    final results = await Future.wait([
+      fetchGenres(),
+      fetchCategories(),
+      fetchStatus(),
+      fetchRatings(),
+    ]);
 
     setState(() {
-      genres = fetchedGenres;
-      categories = fetchedCategories;
-      status = fetchedStatus;
-      ratings = fetchedRatings;
+      genres = results[0];
+      categories = results[1];
+      status = results[2];
+      ratings = results[3];
       isLoading = false;
     });
   }

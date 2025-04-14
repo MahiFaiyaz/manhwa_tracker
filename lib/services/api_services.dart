@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 Future<List<Map<String, dynamic>>> loadMockData(String filename) async {
+  await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+
   final String jsonString = await rootBundle.loadString(
     'lib/sample_data/$filename.json',
   );
