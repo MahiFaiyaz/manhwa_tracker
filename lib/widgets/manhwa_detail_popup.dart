@@ -13,11 +13,17 @@ class ManhwaDetailPopup extends StatelessWidget {
     final synopsis = manhwa.synopsis;
     final rating = manhwa.rating;
     final status = manhwa.status;
+    final chapters = switch (manhwa.chapters.toLowerCase()) {
+      'more than 100' => '100+',
+      'less than 100' => '< 100',
+      _ => manhwa.chapters,
+    };
+    final yearReleased = manhwa.yearReleased;
     final genres = List<String>.from(manhwa.genres);
     final categories = List<String>.from(manhwa.categories);
 
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.83,
+      height: MediaQuery.sizeOf(context).height * 0.9,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Scrollbar(
@@ -61,28 +67,37 @@ class ManhwaDetailPopup extends StatelessWidget {
                           horizontal: 8,
                           vertical: 6,
                         ),
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 5,
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 5,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _chip("Status: $status", dark: true),
+                                _chip("Chapters: $chapters", dark: true),
+                                _chip("Year: $yearReleased", dark: true),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
                     Positioned(
                       right: 0,
                       top: 0,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          _chip("Rating: $rating", dark: true),
-                          const SizedBox(height: 4), // spacing here
-                          _chip("Status: $status", dark: true),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: _chip("Rating: $rating", isRating: true),
                       ),
                     ),
                   ],
@@ -125,19 +140,39 @@ class ManhwaDetailPopup extends StatelessWidget {
     );
   }
 
-  Widget _chip(String label, {bool dark = false}) {
+  Color _getRatingColor(String label) {
+    switch (label.toLowerCase()) {
+      case 'rating: highly recommended':
+        return Colors.green.shade800;
+      case 'rating: recommended':
+        return Colors.green.shade600;
+      case 'rating: good':
+        return Colors.blue.shade400;
+      case 'rating: decent':
+        return Colors.grey.shade500;
+      case 'rating: meh':
+        return Colors.red.shade400;
+      case 'rating: n/a':
+        return Colors.black;
+      default:
+        return Colors.black; // fallback to default chip color
+    }
+  }
+
+  Widget _chip(String label, {bool dark = false, bool isRating = false}) {
+    final bgColor =
+        isRating
+            ? _getRatingColor(label)
+            : (dark ? Colors.black26 : Colors.purple[100]);
+
+    final textColor = dark ? Colors.white : Colors.black;
+
     return Chip(
       padding: EdgeInsets.zero,
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          color: dark ? Colors.white : Colors.black,
-        ),
-      ),
-      backgroundColor: dark ? Colors.black26 : Colors.purple[100],
+      label: Text(label, style: TextStyle(fontSize: 12, color: textColor)),
+      backgroundColor: bgColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
