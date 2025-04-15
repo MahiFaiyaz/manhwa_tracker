@@ -64,7 +64,6 @@ flutter:
     - lib/sample_data/categories.json
     - lib/sample_data/ratings.json
     - lib/sample_data/status.json
-    - lib/sample_data/manhwas.json
 
 
   #   - images/a_dot_ham.jpeg
