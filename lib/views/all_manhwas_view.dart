@@ -91,7 +91,6 @@ class _AllManhwasViewState extends State<AllManhwasView> {
                   canRefresh
                       ? "Refresh"
                       : "Wait ${formatDuration(cooldownSecondsRemaining)}",
-                  style: const TextStyle(fontSize: 12),
                 ),
               ],
             ),

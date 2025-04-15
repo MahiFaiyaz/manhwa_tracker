@@ -228,13 +228,6 @@ class _HomeViewState extends State<HomeView> {
               onPressed: _showResults,
               style: ElevatedButton.styleFrom(
                 minimumSize: Size((MediaQuery.sizeOf(context).width * 0.5), 50),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
               ),
               child: const Text('Find'),
             ),

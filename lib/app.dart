@@ -31,7 +31,37 @@ class MyApp extends StatelessWidget {
                 splashFactory: NoSplash.splashFactory,
                 highlightColor: Colors.transparent,
                 splashColor: Colors.transparent,
+
+                elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple, // 🟣 background
+                    foregroundColor: Colors.white, // ✅ text/icon color
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey.shade300,
+                    textStyle: const TextStyle(fontSize: 13),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
               ),
+
               home: const RootView(),
             ),
           ),
