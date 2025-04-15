@@ -23,6 +23,10 @@ class _HomeViewState extends State<HomeView> {
   List<String> selectedCategories = [];
   List<String> selectedStatus = [];
   List<String> selectedRatings = [];
+  int minYear = 1980;
+  int maxYear = 2025;
+  int minChapters = 0;
+  int maxChapters = 1000;
 
   @override
   void initState() {
@@ -173,6 +177,71 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
           const SizedBox(height: 24),
+
+          ExpansionTile(
+            title: const Text(
+              'Year Released',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            children: [
+              RangeSlider(
+                values: RangeValues(minYear.toDouble(), maxYear.toDouble()),
+                min: 1980,
+                max: 2025,
+                divisions: 45,
+                labels: RangeLabels('$minYear', '$maxYear'),
+                onChanged: (RangeValues values) {
+                  setState(() {
+                    minYear = values.start.round();
+                    maxYear = values.end.round();
+                  });
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text('Min: $minYear'), Text('Max: $maxYear')],
+                ),
+              ),
+            ],
+          ),
+          ExpansionTile(
+            title: const Text(
+              'Chapters',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            children: [
+              RangeSlider(
+                values: RangeValues(
+                  minChapters.toDouble(),
+                  maxChapters.toDouble(),
+                ),
+                min: 0,
+                max: 1000,
+                divisions: 50,
+                labels: RangeLabels('$minChapters', '$maxChapters'),
+                onChanged: (RangeValues values) {
+                  setState(() {
+                    minChapters = values.start.round();
+                    maxChapters = values.end.round();
+                  });
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Min: $minChapters'),
+                    Text('Max: $maxChapters'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
           ElevatedButton(
             onPressed: _showResults,
             style: ElevatedButton.styleFrom(
