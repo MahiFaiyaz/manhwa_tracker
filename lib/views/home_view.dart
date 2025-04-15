@@ -178,12 +178,12 @@ class _HomeViewState extends State<HomeView> {
           ),
           const SizedBox(height: 24),
 
-          ExpansionTile(
-            title: const Text(
-              'Year Released',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+          Column(
             children: [
+              Text(
+                'Year Released',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               RangeSlider(
                 values: RangeValues(minYear.toDouble(), maxYear.toDouble()),
                 min: 1980,
@@ -197,21 +197,21 @@ class _HomeViewState extends State<HomeView> {
                   });
                 },
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text('Min: $minYear'), Text('Max: $maxYear')],
-                ),
-              ),
             ],
           ),
-          ExpansionTile(
-            title: const Text(
-              'Chapters',
-              style: TextStyle(fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Text('Min: $minYear'), Text('Max: $maxYear')],
             ),
+          ),
+          Column(
             children: [
+              Text(
+                'Chapters',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               RangeSlider(
                 values: RangeValues(
                   minChapters.toDouble(),
@@ -228,17 +228,14 @@ class _HomeViewState extends State<HomeView> {
                   });
                 },
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Min: $minChapters'),
-                    Text('Max: $maxChapters'),
-                  ],
-                ),
-              ),
             ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Text('Min: $minChapters'), Text('Max: $maxChapters')],
+            ),
           ),
           const SizedBox(height: 24),
 

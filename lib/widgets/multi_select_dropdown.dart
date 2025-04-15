@@ -48,9 +48,13 @@ class MultiSelectDropdown extends StatelessWidget {
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: label,
+            labelStyle: const TextStyle(
+              fontSize: 20, // increase size
+              fontWeight: FontWeight.bold, // make it bold
+            ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
-          child: Text(displayText),
+          child: Text(displayText, style: TextStyle(fontSize: 16)),
         ),
       ),
     );
