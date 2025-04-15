@@ -23,10 +23,9 @@ class _HomeViewState extends State<HomeView> {
   List<String> selectedCategories = [];
   List<String> selectedStatus = [];
   List<String> selectedRatings = [];
-  int minYear = 1980;
-  int maxYear = 2025;
+  int minYear = 1995;
+  int maxYear = DateTime.now().year;
   int minChapters = 0;
-  int maxChapters = 1000;
 
   @override
   void initState() {
@@ -92,10 +91,9 @@ class _HomeViewState extends State<HomeView> {
           categories: selectedCategories,
           status: selectedStatus,
           ratings: selectedRatings,
-          minChapters: 0,
-          maxChapters: 0,
-          minYearReleased: 0,
-          maxYearReleased: 0,
+          minChapters: minChapters,
+          minYearReleased: minYear,
+          maxYearReleased: maxYear,
         ),
         onFallback: _showSnackBar,
       );
@@ -177,66 +175,48 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
           const SizedBox(height: 24),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Chapters'),
+              Slider(
+                value: minChapters.toDouble(),
+                min: 0,
+                max: 400,
+                divisions: 100,
+                label: '$minChapters+',
+                onChanged: (value) {
+                  setState(() {
+                    minChapters = value.round();
+                  });
+                },
+              ),
+              Text('Only show manhwas with $minChapters+ chapters'),
+            ],
+          ),
+          const SizedBox(height: 24),
 
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Year Released',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+              const Text('Year Released'),
               RangeSlider(
                 values: RangeValues(minYear.toDouble(), maxYear.toDouble()),
-                min: 1980,
-                max: 2025,
-                divisions: 45,
+                min: 1995,
+                max: DateTime.now().year.toDouble(),
                 labels: RangeLabels('$minYear', '$maxYear'),
-                onChanged: (RangeValues values) {
+                divisions: DateTime.now().year - 1995,
+                onChanged: (values) {
                   setState(() {
                     minYear = values.start.round();
                     maxYear = values.end.round();
                   });
                 },
               ),
+              Text('Between $minYear and $maxYear'),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Text('Min: $minYear'), Text('Max: $maxYear')],
-            ),
-          ),
-          Column(
-            children: [
-              Text(
-                'Chapters',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              RangeSlider(
-                values: RangeValues(
-                  minChapters.toDouble(),
-                  maxChapters.toDouble(),
-                ),
-                min: 0,
-                max: 1000,
-                divisions: 50,
-                labels: RangeLabels('$minChapters', '$maxChapters'),
-                onChanged: (RangeValues values) {
-                  setState(() {
-                    minChapters = values.start.round();
-                    maxChapters = values.end.round();
-                  });
-                },
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Text('Min: $minChapters'), Text('Max: $maxChapters')],
-            ),
-          ),
+
           const SizedBox(height: 24),
 
           ElevatedButton(
