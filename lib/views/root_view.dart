@@ -22,10 +22,30 @@ class _RootViewState extends State<RootView> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.purple,
+        unselectedItemColor: Colors.grey.shade500,
+        type: BottomNavigationBarType.fixed,
+        showUnselectedLabels: true,
+        showSelectedLabels: true,
+        selectedLabelStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Library'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'All'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book_outlined),
+            label: 'Library',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list_alt_outlined),
+            label: 'All',
+          ),
         ],
       ),
     );
