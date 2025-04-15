@@ -20,7 +20,15 @@ class MyApp extends StatelessWidget {
             constraints: BoxConstraints(minWidth: width, maxWidth: width),
             child: MaterialApp(
               title: 'Manhwa Tracker',
-              theme: ThemeData.dark(),
+              theme: ThemeData.dark().copyWith(
+                scaffoldBackgroundColor: Colors.black,
+                appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.black,
+                  elevation: 0,
+                  centerTitle: true,
+                  surfaceTintColor: Colors.black12,
+                ),
+              ),
               home: const RootView(),
             ),
           ),
