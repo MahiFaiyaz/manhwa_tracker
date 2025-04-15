@@ -80,8 +80,9 @@ class ManhwaDetailPopup extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 6),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
                               children: [
                                 _chip("Status: $status", dark: true),
                                 _chip("Chapters: $chapters", dark: true),
