@@ -19,34 +19,37 @@ class _RootViewState extends State<RootView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _pages),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.purple,
-        unselectedItemColor: Colors.grey.shade500,
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        showSelectedLabels: true,
-        selectedLabelStyle: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book_outlined),
-            label: 'Library',
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          backgroundColor: Colors.black,
+          selectedItemColor: Colors.purple,
+          unselectedItemColor: Colors.grey.shade500,
+          type: BottomNavigationBarType.fixed,
+          showUnselectedLabels: true,
+          showSelectedLabels: true,
+          selectedLabelStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt_outlined),
-            label: 'All',
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
-        ],
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book_outlined),
+              label: 'Library',
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Home'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt_outlined),
+              label: 'All',
+            ),
+          ],
+        ),
       ),
     );
   }
