@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
                   backgroundColor: Colors.black,
                   elevation: 0,
                   centerTitle: true,
-                  surfaceTintColor: Colors.black12,
                 ),
                 splashFactory: NoSplash.splashFactory,
                 highlightColor: Colors.transparent,
@@ -34,8 +33,8 @@ class MyApp extends StatelessWidget {
 
                 elevatedButtonTheme: ElevatedButtonThemeData(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple, // 🟣 background
-                    foregroundColor: Colors.white, // ✅ text/icon color
+                    backgroundColor: Colors.deepPurple.shade300, // background
+                    foregroundColor: Colors.grey.shade200, // text/icon color
                     textStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -60,10 +59,10 @@ class MyApp extends StatelessWidget {
                     ),
                   ),
                 ),
-                sliderTheme: const SliderThemeData(
-                  activeTrackColor: Colors.teal,
-                  inactiveTrackColor: Colors.grey,
-                  thumbColor: Colors.white,
+                sliderTheme: SliderThemeData(
+                  activeTrackColor: Colors.deepPurple.shade300,
+                  inactiveTrackColor: Colors.grey.shade300,
+                  thumbColor: Colors.deepPurple.shade200,
                 ),
               ),
 

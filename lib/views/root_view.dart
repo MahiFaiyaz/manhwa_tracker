@@ -25,7 +25,7 @@ class _RootViewState extends State<RootView> {
           currentIndex: _currentIndex,
           onTap: (index) => setState(() => _currentIndex = index),
           backgroundColor: Colors.black,
-          selectedItemColor: Colors.purple,
+          selectedItemColor: Colors.deepPurple.shade300,
           unselectedItemColor: Colors.grey.shade500,
           type: BottomNavigationBarType.fixed,
           showUnselectedLabels: true,
