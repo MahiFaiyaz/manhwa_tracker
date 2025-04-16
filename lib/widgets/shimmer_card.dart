@@ -3,8 +3,8 @@ import 'package:shimmer/shimmer.dart';
 
 Widget buildShimmerCard() {
   return Shimmer.fromColors(
-    baseColor: Colors.purple[100]!,
-    highlightColor: Colors.purple[300]!,
+    baseColor: Colors.deepPurple.shade100,
+    highlightColor: Colors.deepPurple.shade300,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -12,7 +12,7 @@ Widget buildShimmerCard() {
           aspectRatio: 2 / 3,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.deepPurple.shade300,
               borderRadius: BorderRadius.circular(12),
             ),
           ),

@@ -183,7 +183,7 @@ class _HomeViewState extends State<HomeView> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Chapters'),
+                const Text('Chapters', style: TextStyle(fontSize: 16)),
                 Slider(
                   value: minChapters.toDouble(),
                   min: 0,
@@ -204,7 +204,7 @@ class _HomeViewState extends State<HomeView> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Year Released'),
+                const Text('Year Released', style: TextStyle(fontSize: 16)),
                 RangeSlider(
                   values: RangeValues(minYear.toDouble(), maxYear.toDouble()),
                   min: 1995,
