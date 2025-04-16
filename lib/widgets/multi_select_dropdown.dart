@@ -49,7 +49,7 @@ class MultiSelectDropdown extends StatelessWidget {
           decoration: InputDecoration(
             labelText: label,
             labelStyle: const TextStyle(
-              fontSize: 20, // increase size
+              fontSize: 22, // increase size
               fontWeight: FontWeight.bold, // make it bold
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -136,7 +136,10 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
                       margin: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: isSelected ? Colors.purple[900] : Colors.white,
+                        color:
+                            isSelected
+                                ? Colors.deepPurple.shade200
+                                : Colors.white,
                       ),
                       child: Text(
                         item,
@@ -157,11 +160,6 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: Size((MediaQuery.sizeOf(context).width * 0.5), 50),
-                padding: const EdgeInsets.symmetric(),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                backgroundColor: Colors.grey[700],
               ),
               child: const Text(
                 "Done",

@@ -143,18 +143,18 @@ class ManhwaDetailPopup extends StatelessWidget {
 
   Color _getRatingColor(String label) {
     switch (label.toLowerCase()) {
-      case 'rating: highly recommended':
-        return Colors.green.shade800;
-      case 'rating: recommended':
-        return Colors.green.shade600;
-      case 'rating: good':
-        return Colors.blue.shade400;
-      case 'rating: decent':
-        return Colors.grey.shade500;
-      case 'rating: meh':
-        return Colors.red.shade400;
-      case 'rating: n/a':
-        return Colors.black;
+      // case 'rating: highly recommended':
+      //   return Colors.green.shade800;
+      // case 'rating: recommended':
+      //   return Colors.green.shade600;
+      // case 'rating: good':
+      //   return Colors.blue.shade400;
+      // case 'rating: decent':
+      //   return Colors.grey.shade500;
+      // case 'rating: meh':
+      //   return Colors.red.shade400;
+      // case 'rating: n/a':
+      //   return Colors.black;
       default:
         return Colors.black; // fallback to default chip color
     }
@@ -164,15 +164,15 @@ class ManhwaDetailPopup extends StatelessWidget {
     final bgColor =
         isRating
             ? _getRatingColor(label)
-            : (dark ? Colors.black26 : Colors.purple[100]);
+            : (dark ? Colors.black : Colors.deepPurple.shade200);
 
-    final textColor = dark ? Colors.white : Colors.black;
+    final textColor = dark || isRating ? Colors.white : Colors.black;
 
     return Chip(
       padding: EdgeInsets.zero,
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(label, style: TextStyle(fontSize: 12, color: textColor)),
+      label: Text(label, style: TextStyle(fontSize: 14, color: textColor)),
       backgroundColor: bgColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
