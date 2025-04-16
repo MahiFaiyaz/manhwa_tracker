@@ -60,6 +60,11 @@ class MyApp extends StatelessWidget {
                     ),
                   ),
                 ),
+                sliderTheme: const SliderThemeData(
+                  activeTrackColor: Colors.teal,
+                  inactiveTrackColor: Colors.grey,
+                  thumbColor: Colors.white,
+                ),
               ),
 
               home: const RootView(),
