@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
                     backgroundColor: Colors.deepPurple, // 🟣 background
                     foregroundColor: Colors.white, // ✅ text/icon color
                     textStyle: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                     padding: const EdgeInsets.symmetric(
