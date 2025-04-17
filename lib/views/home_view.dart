@@ -129,13 +129,13 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Manhwa Tracker')),
+        appBar: AppBar(title: const Text('Manhwa Finder')),
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Manhwa Tracker')),
+      appBar: AppBar(title: const Text('Manhwa Finder')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
