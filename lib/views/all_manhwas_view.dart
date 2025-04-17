@@ -20,6 +20,14 @@ class _AllManhwasViewState extends State<AllManhwasView> {
   Timer? cooldownTimer;
   int cooldownSecondsRemaining = 0;
   static const int cooldownDuration = 300; // 5 mins
+  final TextEditingController _searchController = TextEditingController();
+  List<Manhwa> filteredManhwas = [];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -41,6 +49,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
 
     setState(() {
       allManhwas = result.manhwas;
+      filteredManhwas = allManhwas;
       isLoading = false;
     });
 
@@ -74,6 +83,20 @@ class _AllManhwasViewState extends State<AllManhwasView> {
 
   bool get canRefresh => cooldownSecondsRemaining == 0;
 
+  void _search(String query) {
+    final trimmed = query.toLowerCase().trim();
+    setState(() {
+      if (trimmed.isEmpty) {
+        filteredManhwas = allManhwas;
+      } else {
+        filteredManhwas =
+            allManhwas
+                .where((m) => m.name.toLowerCase().contains(trimmed))
+                .toList();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,47 +104,83 @@ class _AllManhwasViewState extends State<AllManhwasView> {
       appBar: AppBar(
         title: const Text('All Manhwas'),
         actions: [
-          ElevatedButton(
-            onPressed: canRefresh ? _fetchAll : null,
-            child: Row(
-              children: [
-                const Icon(Icons.refresh),
-                const SizedBox(width: 8),
-                Text(
-                  canRefresh
-                      ? "Refresh"
-                      : "Wait ${formatDuration(cooldownSecondsRemaining)}",
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              ),
+              onPressed: canRefresh ? _fetchAll : null,
+              child: Row(
+                children: [
+                  const Icon(Icons.refresh),
+                  const SizedBox(width: 8),
+                  Text(
+                    canRefresh
+                        ? "Refresh"
+                        : formatDuration(cooldownSecondsRemaining),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-      body:
-          isLoading
-              ? GridView.builder(
-                itemCount: 18,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 2 / 3,
+      body: Padding(
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 4),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: TextField(
+                controller: _searchController,
+                onChanged: _search,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search titles...',
+                  hintStyle: const TextStyle(color: Colors.white54),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white),
+                  filled: true,
+                  fillColor: Colors.grey.shade900,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
-                itemBuilder: (context, index) => buildShimmerCard(),
-              )
-              : GridView.builder(
-                itemCount: allManhwas.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 2 / 3,
-                ),
-                itemBuilder: (context, index) {
-                  final manhwa = allManhwas[index];
-                  return ManhwaCard(manhwa: manhwa);
-                },
               ),
+            ),
+            Expanded(
+              child:
+                  isLoading
+                      ? GridView.builder(
+                        itemCount: 18,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 2 / 3,
+                            ),
+                        itemBuilder: (context, index) => buildShimmerCard(),
+                      )
+                      : GridView.builder(
+                        itemCount: filteredManhwas.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 2 / 3,
+                            ),
+                        itemBuilder: (context, index) {
+                          final manhwa = filteredManhwas[index];
+                          return ManhwaCard(manhwa: manhwa);
+                        },
+                      ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
