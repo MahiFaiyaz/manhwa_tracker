@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/manhwa.dart';
+import 'custom_chip.dart';
 
 class ManhwaDetailPopup extends StatelessWidget {
   final Manhwa manhwa;
@@ -84,9 +85,9 @@ class ManhwaDetailPopup extends StatelessWidget {
                               spacing: 8,
                               runSpacing: 4,
                               children: [
-                                _chip("Status: $status", dark: true),
-                                _chip("Chapters: $chapters", dark: true),
-                                _chip("Year: $yearReleased", dark: true),
+                                customChip("Status: $status", dark: true),
+                                customChip("Chapters: $chapters", dark: true),
+                                customChip("Year: $yearReleased", dark: true),
                               ],
                             ),
                           ],
@@ -98,7 +99,7 @@ class ManhwaDetailPopup extends StatelessWidget {
                       top: 0,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _chip("Rating: $rating", isRating: true),
+                        child: customChip("Rating: $rating", dark: true),
                       ),
                     ),
                   ],
@@ -112,7 +113,7 @@ class ManhwaDetailPopup extends StatelessWidget {
                 Wrap(
                   spacing: 4,
                   runSpacing: 4,
-                  children: genres.map(_chip).toList(),
+                  children: genres.map(customChip).toList(),
                 ),
                 const SizedBox(height: 12),
                 const Text(
@@ -123,7 +124,7 @@ class ManhwaDetailPopup extends StatelessWidget {
                 Wrap(
                   spacing: 4,
                   runSpacing: 4,
-                  children: categories.map(_chip).toList(),
+                  children: categories.map(customChip).toList(),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -138,43 +139,6 @@ class ManhwaDetailPopup extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Color _getRatingColor(String label) {
-    switch (label.toLowerCase()) {
-      // case 'rating: highly recommended':
-      //   return Colors.green.shade800;
-      // case 'rating: recommended':
-      //   return Colors.green.shade600;
-      // case 'rating: good':
-      //   return Colors.blue.shade400;
-      // case 'rating: decent':
-      //   return Colors.grey.shade500;
-      // case 'rating: meh':
-      //   return Colors.red.shade400;
-      // case 'rating: n/a':
-      //   return Colors.black;
-      default:
-        return Colors.black; // fallback to default chip color
-    }
-  }
-
-  Widget _chip(String label, {bool dark = false, bool isRating = false}) {
-    final bgColor =
-        isRating
-            ? _getRatingColor(label)
-            : (dark ? Colors.black : Colors.deepPurple.shade200);
-
-    final textColor = dark || isRating ? Colors.white : Colors.black;
-
-    return Chip(
-      padding: EdgeInsets.zero,
-      visualDensity: VisualDensity.compact,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(label, style: TextStyle(fontSize: 14, color: textColor)),
-      backgroundColor: bgColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 }

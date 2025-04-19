@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './custom_chip.dart';
 
 class MultiSelectDropdown extends StatelessWidget {
   final String label;
@@ -37,8 +38,27 @@ class MultiSelectDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayText =
-        selectedItems.isEmpty ? 'Select $label' : selectedItems.join(', ');
+    final displayContent =
+        selectedItems.isEmpty
+            ? SizedBox(
+              height: 30,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: customChip("Select $label"),
+              ),
+            )
+            : SizedBox(
+              height: 30, // or whatever max height you want
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children:
+                      selectedItems.map((item) => customChip(item)).toList(),
+                ),
+              ),
+            );
 
     return Material(
       borderRadius: BorderRadius.circular(10),
@@ -54,7 +74,7 @@ class MultiSelectDropdown extends StatelessWidget {
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
-          child: Text(displayText, style: TextStyle(fontSize: 16)),
+          child: displayContent,
         ),
       ),
     );
