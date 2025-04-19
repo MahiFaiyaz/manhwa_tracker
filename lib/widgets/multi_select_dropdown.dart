@@ -38,27 +38,21 @@ class MultiSelectDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayContent =
-        selectedItems.isEmpty
-            ? SizedBox(
-              height: 30,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: customChip("Select $label"),
-              ),
-            )
-            : SizedBox(
-              height: 30, // or whatever max height you want
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Wrap(
+    final displayContent = SizedBox(
+      height: 32,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child:
+            selectedItems.isEmpty
+                ? customChip("Select $label", dark: true)
+                : Wrap(
                   spacing: 6,
                   runSpacing: 6,
                   children:
                       selectedItems.map((item) => customChip(item)).toList(),
                 ),
-              ),
-            );
+      ),
+    );
 
     return Material(
       borderRadius: BorderRadius.circular(10),
@@ -74,7 +68,10 @@ class MultiSelectDropdown extends StatelessWidget {
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
-          child: displayContent,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: displayContent,
+          ),
         ),
       ),
     );
