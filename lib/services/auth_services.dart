@@ -18,9 +18,23 @@ Future<bool> loginUser({
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+
+      final authToken = data['access_token'];
+      final refreshToken = data['refresh_token'];
+
+      if (authToken == null || refreshToken == null) {
+        debugPrint(
+          "Login response missing tokens: access_token=$authToken, refresh_token=$refreshToken",
+        );
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onError?.call("Login succeeded but access/refresh token missing.");
+        });
+        return false;
+      }
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('auth_token', data['auth_token']);
-      await prefs.setString('refresh_token', data['refresh_token']);
+      await prefs.setString('auth_token', authToken);
+      await prefs.setString('refresh_token', refreshToken);
       return true;
     } else {
       final err = 'Login failed: ${response.statusCode}';
@@ -95,8 +109,24 @@ Future<void> refreshAuthToken({void Function(String)? onError}) async {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      await prefs.setString('auth_token', data['auth_token']);
-      await prefs.setString('refresh_token', data['refresh_token']);
+
+      final authToken = data['access_token'];
+      final newRefreshToken = data['refresh_token'];
+
+      if (authToken == null || newRefreshToken == null) {
+        debugPrint(
+          "Missing token(s): access_token=$authToken, refresh_token=$newRefreshToken",
+        );
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onError?.call(
+            "Token refresh succeeded but access/refresh token missing.",
+          );
+        });
+        return;
+      }
+
+      await prefs.setString('auth_token', authToken);
+      await prefs.setString('refresh_token', newRefreshToken);
     } else {
       final err = 'Refresh token failed: ${response.statusCode}';
       debugPrint(err);
