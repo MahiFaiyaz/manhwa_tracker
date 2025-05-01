@@ -164,3 +164,9 @@ Future<void> refreshAuthToken({void Function(String)? onError}) async {
     });
   }
 }
+
+Future<bool> isUserLoggedIn() async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('auth_token');
+  return token != null && token.isNotEmpty;
+}
