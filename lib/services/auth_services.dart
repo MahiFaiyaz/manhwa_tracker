@@ -67,6 +67,29 @@ Future<bool> signUpUser({
 
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 422) {
+      final data = json.decode(response.body);
+      final detail = data['detail'];
+      if (detail is List && detail.isNotEmpty && detail[0]['msg'] != null) {
+        final fullMsg = detail[0]['msg'].toString();
+        final cleanedMsg =
+            fullMsg.contains(', ')
+                ? fullMsg
+                    .split(', ')
+                    .last // take just the user-defined part
+                : fullMsg;
+
+        debugPrint("Signup validation failed: $cleanedMsg");
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onError?.call(cleanedMsg);
+        });
+      } else {
+        debugPrint("Signup 422 error but no clear message: $data");
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onError?.call("Signup validation failed. Please check your inputs.");
+        });
+      }
+      return false;
     } else {
       final err = 'Signup failed: ${response.statusCode}';
       debugPrint(err);
