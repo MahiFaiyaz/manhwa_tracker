@@ -49,21 +49,33 @@ class _LibraryViewState extends State<LibraryView> {
       appBar: AppBar(
         title: const Text('Library'),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.person),
-            padding: EdgeInsets.zero, // Remove default padding
-            offset: const Offset(0, 36), // Optional: adjust dropdown position
-            onSelected: (value) {
-              if (value == 'logout') handleLogout();
-            },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem<String>(
-                    height: 20, // ⬅️ forces a shorter height
-                    value: 'logout',
-                    child: Text('Log Out'),
-                  ),
-                ],
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: PopupMenuButton<String>(
+              // icon: const Icon(Icons.person),
+              offset: const Offset(0, 44), // Optional: adjust dropdown position
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color:
+                      Colors.deepPurple.shade300, // match your ElevatedButton
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.person, color: Colors.white, size: 20),
+              ),
+              onSelected: (value) {
+                if (value == 'logout') handleLogout();
+              },
+              itemBuilder:
+                  (context) => [
+                    const PopupMenuItem<String>(
+                      height: 16, // ⬅️ forces a shorter height
+                      value: 'logout',
+                      child: Text('Log Out'),
+                    ),
+                  ],
+            ),
           ),
         ],
       ),
