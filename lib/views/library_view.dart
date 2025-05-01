@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_services.dart';
-import 'login_signup_view.dart'; // You'll create this next
+import 'login_signup_view.dart';
 
 class LibraryView extends StatefulWidget {
   const LibraryView({super.key});
@@ -23,6 +23,11 @@ class _LibraryViewState extends State<LibraryView> {
     setState(() => _isLoggedIn = loggedIn);
   }
 
+  void handleLogout() async {
+    await logoutUser();
+    setState(() => _isLoggedIn = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoggedIn == null) {
@@ -35,15 +40,33 @@ class _LibraryViewState extends State<LibraryView> {
     if (!_isLoggedIn!) {
       return LoginSignupView(
         onLoginSuccess: () {
-          setState(
-            () => _isLoggedIn = true,
-          ); // Reload this widget as "logged in"
+          setState(() => _isLoggedIn = true);
         },
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Library')),
+      appBar: AppBar(
+        title: const Text('Library'),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.person),
+            padding: EdgeInsets.zero, // Remove default padding
+            offset: const Offset(0, 36), // Optional: adjust dropdown position
+            onSelected: (value) {
+              if (value == 'logout') handleLogout();
+            },
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem<String>(
+                    height: 20, // ⬅️ forces a shorter height
+                    value: 'logout',
+                    child: Text('Log Out'),
+                  ),
+                ],
+          ),
+        ],
+      ),
       backgroundColor: Colors.black,
       body: const Center(
         child: Text(
