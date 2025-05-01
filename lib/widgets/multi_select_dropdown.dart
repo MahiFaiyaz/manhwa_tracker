@@ -44,7 +44,10 @@ class MultiSelectDropdown extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child:
             selectedItems.isEmpty
-                ? customChip("Select $label", dark: true)
+                ? Text(
+                  "Select $label",
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                )
                 : Wrap(
                   spacing: 6,
                   runSpacing: 6,
