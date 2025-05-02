@@ -24,8 +24,10 @@ class _LibraryViewState extends State<LibraryView> {
   void initState() {
     super.initState();
     checkLoginStatus();
-    loadUserEmail();
-    fetchLibrary();
+    if (_isLoggedIn == true) {
+      fetchLibrary();
+      loadUserEmail();
+    }
   }
 
   Future<void> checkLoginStatus() async {
@@ -81,6 +83,7 @@ class _LibraryViewState extends State<LibraryView> {
         onLoginSuccess: () {
           setState(() => _isLoggedIn = true);
           fetchLibrary(); // re-fetch after login
+          loadUserEmail();
         },
       );
     }
