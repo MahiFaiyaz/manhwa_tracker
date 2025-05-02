@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../services/auth_services.dart';
 import 'login_signup_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/manhwa.dart';
+import '../services/api_services.dart';
+import '../widgets/manhwa_card.dart';
+import '../widgets/shimmer_card.dart';
 
 class LibraryView extends StatefulWidget {
   const LibraryView({super.key});
@@ -13,12 +17,15 @@ class LibraryView extends StatefulWidget {
 class _LibraryViewState extends State<LibraryView> {
   bool? _isLoggedIn;
   String? userEmail;
+  bool isLoading = true;
+  List<Manhwa> libraryManhwas = [];
 
   @override
   void initState() {
     super.initState();
     checkLoginStatus();
     loadUserEmail();
+    fetchLibrary();
   }
 
   Future<void> checkLoginStatus() async {
@@ -34,9 +41,30 @@ class _LibraryViewState extends State<LibraryView> {
   }
 
   void handleLogout() async {
-    print(userEmail);
     await logoutUser();
     setState(() => _isLoggedIn = false);
+  }
+
+  Future<void> fetchLibrary() async {
+    try {
+      final result = await fetchUserProgress(
+        onFallback: (msg) => _showSnackBar(msg),
+      );
+      setState(() {
+        libraryManhwas = result;
+        isLoading = false;
+      });
+    } catch (e) {
+      _showSnackBar("Failed to load your library.");
+      setState(() => isLoading = false);
+    }
+  }
+
+  void _showSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -52,6 +80,7 @@ class _LibraryViewState extends State<LibraryView> {
       return LoginSignupView(
         onLoginSuccess: () {
           setState(() => _isLoggedIn = true);
+          fetchLibrary(); // re-fetch after login
         },
       );
     }
@@ -63,14 +92,12 @@ class _LibraryViewState extends State<LibraryView> {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: PopupMenuButton<String>(
-              // icon: const Icon(Icons.person),
-              offset: const Offset(0, 44), // Optional: adjust dropdown position
+              offset: const Offset(0, 44),
               child: Container(
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color:
-                      Colors.deepPurple.shade300, // match your ElevatedButton
+                  color: Colors.deepPurple.shade300,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.person, color: Colors.white, size: 20),
@@ -82,7 +109,7 @@ class _LibraryViewState extends State<LibraryView> {
                   (context) => [
                     if (userEmail != null)
                       PopupMenuItem<String>(
-                        height: 16, // ⬅️ forces a shorter height
+                        height: 16,
                         enabled: false,
                         child: Text(
                           userEmail!,
@@ -96,7 +123,7 @@ class _LibraryViewState extends State<LibraryView> {
                       child: Divider(thickness: 2),
                     ),
                     const PopupMenuItem<String>(
-                      height: 16, // ⬅️ forces a shorter height
+                      height: 16,
                       value: 'logout',
                       child: Text('Log Out'),
                     ),
@@ -106,11 +133,33 @@ class _LibraryViewState extends State<LibraryView> {
         ],
       ),
       backgroundColor: Colors.black,
-      body: const Center(
-        child: Text(
-          '📚 Welcome to your Library!',
-          style: TextStyle(fontSize: 18, color: Colors.white70),
-        ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+        child:
+            isLoading
+                ? GridView.builder(
+                  itemCount: 18,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 2 / 3,
+                  ),
+                  itemBuilder: (context, index) => buildShimmerCard(),
+                )
+                : GridView.builder(
+                  itemCount: libraryManhwas.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 2 / 3,
+                  ),
+                  itemBuilder: (context, index) {
+                    final manhwa = libraryManhwas[index];
+                    return ManhwaCard(manhwa: manhwa);
+                  },
+                ),
       ),
     );
   }

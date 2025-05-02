@@ -157,7 +157,7 @@ Future<List<Manhwa>> fetchUserProgress({
       Uri.parse('$apiBaseUrl/progress'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'auth-token': 'Bearer $token',
       },
     );
 
