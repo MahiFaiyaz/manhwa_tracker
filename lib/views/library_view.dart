@@ -23,10 +23,14 @@ class _LibraryViewState extends State<LibraryView> {
   @override
   void initState() {
     super.initState();
-    checkLoginStatus();
+    _init();
+  }
+
+  Future<void> _init() async {
+    await checkLoginStatus();
     if (_isLoggedIn == true) {
-      fetchLibrary();
-      loadUserEmail();
+      await fetchLibrary();
+      await loadUserEmail();
     }
   }
 
