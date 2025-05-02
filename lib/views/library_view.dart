@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_services.dart';
 import 'login_signup_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LibraryView extends StatefulWidget {
   const LibraryView({super.key});
@@ -11,11 +12,13 @@ class LibraryView extends StatefulWidget {
 
 class _LibraryViewState extends State<LibraryView> {
   bool? _isLoggedIn;
+  String? userEmail;
 
   @override
   void initState() {
     super.initState();
     checkLoginStatus();
+    loadUserEmail();
   }
 
   Future<void> checkLoginStatus() async {
@@ -23,7 +26,15 @@ class _LibraryViewState extends State<LibraryView> {
     setState(() => _isLoggedIn = loggedIn);
   }
 
+  Future<void> loadUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userEmail = prefs.getString('user_email');
+    });
+  }
+
   void handleLogout() async {
+    print(userEmail);
     await logoutUser();
     setState(() => _isLoggedIn = false);
   }
@@ -69,6 +80,21 @@ class _LibraryViewState extends State<LibraryView> {
               },
               itemBuilder:
                   (context) => [
+                    if (userEmail != null)
+                      PopupMenuItem<String>(
+                        height: 16, // ⬅️ forces a shorter height
+                        enabled: false,
+                        child: Text(
+                          userEmail!,
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    const PopupMenuItem<String>(
+                      enabled: false,
+                      height: 1,
+                      padding: EdgeInsets.zero,
+                      child: Divider(thickness: 2),
+                    ),
                     const PopupMenuItem<String>(
                       height: 16, // ⬅️ forces a shorter height
                       value: 'logout',

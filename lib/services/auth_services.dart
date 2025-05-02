@@ -35,6 +35,7 @@ Future<bool> loginUser({
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', authToken);
       await prefs.setString('refresh_token', refreshToken);
+      await prefs.setString('user_email', email);
       return true;
     } else {
       final err = 'Login failed: ${response.statusCode}';
@@ -111,6 +112,7 @@ Future<void> logoutUser() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove('auth_token');
   await prefs.remove('refresh_token');
+  await prefs.remove('user_email');
 }
 
 Future<String?> getAuthToken() async {
