@@ -6,6 +6,7 @@ import '../utils/config.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/widgets.dart';
 import '../models/manhwa_filter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<List<Map<String, dynamic>>> loadMockData(String filename) async {
   await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
@@ -107,7 +108,7 @@ Future<List<Rating>> fetchRatings({void Function(String)? onFallback}) async {
   }
 }
 
-Future<ManhwaFetchResult> fetchManhwas({
+Future<List<Manhwa>> fetchManhwas({
   required ManhwaFilter filter,
   void Function(String)? onFallback,
 }) async {
@@ -124,7 +125,7 @@ Future<ManhwaFetchResult> fetchManhwas({
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       final manhwas = data.map((json) => Manhwa.fromJson(json)).toList();
-      return ManhwaFetchResult(manhwas: manhwas);
+      return manhwas;
     } else {
       throw Exception('Bad status code: ${response.statusCode}');
     }
@@ -137,6 +138,41 @@ Future<ManhwaFetchResult> fetchManhwas({
       });
     }
 
-    return ManhwaFetchResult(manhwas: [], fromFallback: true);
+    return [];
+  }
+}
+
+Future<List<Manhwa>> fetchUserProgress({
+  void Function(String)? onFallback,
+}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    if (token == null) {
+      throw Exception("No auth token found.");
+    }
+
+    final response = await http.get(
+      Uri.parse('$apiBaseUrl/progress'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Manhwa.fromJson(json)).toList();
+    } else {
+      throw Exception('Progress fetch failed: status ${response.statusCode}');
+    }
+  } catch (e) {
+    foundation.debugPrint("Progress API failed: $e");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onFallback?.call("Failed to load your library.");
+    });
+
+    return []; // safe default
   }
 }

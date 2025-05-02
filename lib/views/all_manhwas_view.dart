@@ -48,7 +48,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
     );
 
     setState(() {
-      allManhwas = result.manhwas;
+      allManhwas = result;
       filteredManhwas = allManhwas;
       isLoading = false;
     });

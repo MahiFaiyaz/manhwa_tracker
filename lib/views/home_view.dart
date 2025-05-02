@@ -102,13 +102,8 @@ class _HomeViewState extends State<HomeView> {
 
       Navigator.pop(context); // remove loading spinner
 
-      if (result.manhwas.isEmpty && !result.fromFallback) {
+      if (result.isEmpty) {
         _showSnackBar("No results found.");
-        return;
-      }
-
-      if (result.manhwas.isEmpty && result.fromFallback) {
-        // Already showed fallback message inside fetch
         return;
       }
 
@@ -116,7 +111,7 @@ class _HomeViewState extends State<HomeView> {
         context: context,
         showDragHandle: true,
         isScrollControlled: true,
-        builder: (_) => ResultPopup(manhwas: result.manhwas),
+        builder: (_) => ResultPopup(manhwas: result),
       );
     } catch (e) {
       if (!mounted) return;
