@@ -1,11 +1,29 @@
 import 'package:flutter/material.dart';
 import '../models/manhwa.dart';
 import 'custom_chip.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ManhwaDetailPopup extends StatelessWidget {
   final Manhwa manhwa;
 
   const ManhwaDetailPopup({super.key, required this.manhwa});
+
+  double _mapRatingToStars(String? rating) {
+    switch (rating) {
+      case 'Highly Recommended':
+        return 5.0;
+      case 'Recommended':
+        return 4.0;
+      case 'Good':
+        return 3.0;
+      case 'Decent':
+        return 2.0;
+      case 'Meh':
+        return 1.0;
+      default:
+        return 0.0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +126,27 @@ class ManhwaDetailPopup extends StatelessWidget {
                       top: 0,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: customChip("Rating: $rating", dark: true),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black87,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: RatingBarIndicator(
+                            rating: _mapRatingToStars(manhwa.rating),
+                            itemBuilder:
+                                (context, index) => Icon(
+                                  Icons.star,
+                                  color: Colors.deepPurple.shade300,
+                                ),
+                            itemCount: 5,
+                            itemSize: 20.0,
+                            direction: Axis.horizontal,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -124,7 +162,6 @@ class ManhwaDetailPopup extends StatelessWidget {
                             spacing: 4,
                             runSpacing: 4,
                             children: [
-                              customChip("Rating: $rating"),
                               customChip(
                                 "Reading: ${readingStatusLabels[manhwa.readingStatus]}",
                               ),
