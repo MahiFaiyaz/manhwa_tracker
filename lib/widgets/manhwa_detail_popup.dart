@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import '../models/manhwa.dart';
 import 'custom_chip.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ManhwaDetailPopup extends StatelessWidget {
   final Manhwa manhwa;
@@ -135,16 +135,31 @@ class ManhwaDetailPopup extends StatelessWidget {
                             color: Colors.black87,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: RatingBarIndicator(
-                            rating: _mapRatingToStars(manhwa.rating),
-                            itemBuilder:
-                                (context, index) => Icon(
-                                  Icons.star,
-                                  color: Colors.deepPurple.shade300,
-                                ),
-                            itemCount: 5,
-                            itemSize: 20.0,
-                            direction: Axis.horizontal,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: List.generate(5, (index) {
+                                  final rating = _mapRatingToStars(
+                                    manhwa.rating,
+                                  );
+                                  final isFilled = index < rating;
+
+                                  final starIcon = Icon(
+                                    isFilled ? Icons.star : Icons.star_border,
+                                    color: Colors.deepPurple.shade300,
+                                    size: 24,
+                                  );
+                                  return isFilled
+                                      ? Shimmer.fromColors(
+                                        baseColor: Colors.deepPurple.shade300,
+                                        highlightColor:
+                                            Colors.deepPurple.shade100,
+                                        child: starIcon,
+                                      )
+                                      : starIcon;
+                                }),
+                              ),
+                            ],
                           ),
                         ),
                       ),
