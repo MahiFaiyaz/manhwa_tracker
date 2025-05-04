@@ -18,6 +18,8 @@ class _LibraryViewState extends State<LibraryView> {
   bool? _isLoggedIn;
   String? userEmail;
   bool isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
+  List<Manhwa> filteredManhwas = [];
   List<Manhwa> libraryManhwas = [];
 
   @override
@@ -32,6 +34,12 @@ class _LibraryViewState extends State<LibraryView> {
       await fetchLibrary();
       await loadUserEmail();
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> checkLoginStatus() async {
@@ -58,6 +66,7 @@ class _LibraryViewState extends State<LibraryView> {
       );
       setState(() {
         libraryManhwas = result;
+        filteredManhwas = libraryManhwas;
         isLoading = false;
       });
     } catch (e) {
@@ -71,6 +80,20 @@ class _LibraryViewState extends State<LibraryView> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _search(String query) {
+    final trimmed = query.toLowerCase().trim();
+    setState(() {
+      if (trimmed.isEmpty) {
+        filteredManhwas = libraryManhwas;
+      } else {
+        filteredManhwas =
+            libraryManhwas
+                .where((m) => m.name.toLowerCase().contains(trimmed))
+                .toList();
+      }
+    });
   }
 
   @override
@@ -141,32 +164,59 @@ class _LibraryViewState extends State<LibraryView> {
       ),
       backgroundColor: Colors.black,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-        child:
-            isLoading
-                ? GridView.builder(
-                  itemCount: 18,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 2 / 3,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: TextField(
+                controller: _searchController,
+                onChanged: _search,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search titles...',
+                  hintStyle: const TextStyle(color: Colors.white54),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white),
+                  filled: true,
+                  fillColor: Colors.grey.shade900,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
-                  itemBuilder: (context, index) => buildShimmerCard(),
-                )
-                : GridView.builder(
-                  itemCount: libraryManhwas.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 2 / 3,
-                  ),
-                  itemBuilder: (context, index) {
-                    final manhwa = libraryManhwas[index];
-                    return ManhwaCard(manhwa: manhwa);
-                  },
                 ),
+              ),
+            ),
+            Expanded(
+              child:
+                  isLoading
+                      ? GridView.builder(
+                        itemCount: 18,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 2 / 3,
+                            ),
+                        itemBuilder: (context, index) => buildShimmerCard(),
+                      )
+                      : GridView.builder(
+                        itemCount: filteredManhwas.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 2 / 3,
+                            ),
+                        itemBuilder: (context, index) {
+                          final manhwa = filteredManhwas[index];
+                          return ManhwaCard(manhwa: manhwa);
+                        },
+                      ),
+            ),
+          ],
+        ),
       ),
     );
   }
