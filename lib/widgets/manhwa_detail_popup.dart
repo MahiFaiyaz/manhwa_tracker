@@ -23,6 +23,15 @@ class ManhwaDetailPopup extends StatelessWidget {
     final genres = List<String>.from(manhwa.genres);
     final categories = List<String>.from(manhwa.categories);
 
+    const readingStatusLabels = {
+      'reading': 'Reading',
+      'completed': 'Completed',
+      'dropped': 'Dropped',
+      'on_hold': 'On Hold',
+      'not_read': 'Not Read',
+      'to_read': 'To Read',
+    };
+
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.9,
       child: Padding(
@@ -105,6 +114,30 @@ class ManhwaDetailPopup extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Row(
+                        children: [
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: 4,
+                            children: [
+                              customChip("Rating: $rating"),
+                              customChip(
+                                "Reading: ${readingStatusLabels[manhwa.readingStatus]}",
+                              ),
+                              if (manhwa.currentChapter > 0)
+                                customChip("Chapter: ${manhwa.currentChapter}"),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 const Text(
                   "Genres:",
                   style: TextStyle(fontWeight: FontWeight.bold),
