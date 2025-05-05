@@ -126,40 +126,50 @@ class ManhwaDetailPopup extends StatelessWidget {
                       top: 0,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            // TODO: Show your bottom popup for editing reading status/chapter
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: customChip(
+                            "${readingStatusLabels[manhwa.readingStatus]}${manhwa.currentChapter > 0 ? ": Ch ${manhwa.currentChapter}" : ""}",
+                            icon: Icons.edit,
+                            shimmer: true,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.black87,
+                            color: Colors.deepPurple.shade200,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: List.generate(5, (index) {
-                                  final rating = _mapRatingToStars(
-                                    manhwa.rating,
-                                  );
-                                  final isFilled = index < rating;
-
-                                  final starIcon = Icon(
-                                    isFilled ? Icons.star : Icons.star_border,
-                                    color: Colors.deepPurple.shade300,
-                                    size: 24,
-                                  );
-                                  return isFilled
-                                      ? Shimmer.fromColors(
-                                        baseColor: Colors.deepPurple.shade300,
-                                        highlightColor:
-                                            Colors.deepPurple.shade100,
-                                        child: starIcon,
-                                      )
-                                      : starIcon;
-                                }),
-                              ),
-                            ],
+                          child: Row(
+                            children: List.generate(5, (index) {
+                              final starRating = _mapRatingToStars(rating);
+                              final isFilled = index < starRating;
+                              final starIcon = Icon(
+                                isFilled ? Icons.star : Icons.star_border,
+                                color: Colors.black,
+                                size: 24,
+                              );
+                              return isFilled
+                                  ? Shimmer.fromColors(
+                                    baseColor: Colors.black,
+                                    highlightColor: Colors.deepPurple.shade100,
+                                    child: starIcon,
+                                  )
+                                  : starIcon;
+                            }),
                           ),
                         ),
                       ),
@@ -167,29 +177,6 @@ class ManhwaDetailPopup extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Row(
-                        children: [
-                          Wrap(
-                            spacing: 4,
-                            runSpacing: 4,
-                            children: [
-                              customChip(
-                                "Reading: ${readingStatusLabels[manhwa.readingStatus]}",
-                              ),
-                              if (manhwa.currentChapter > 0)
-                                customChip("Chapter: ${manhwa.currentChapter}"),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
                 const Text(
                   "Genres:",
                   style: TextStyle(fontWeight: FontWeight.bold),
