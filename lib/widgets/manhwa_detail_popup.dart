@@ -50,6 +50,20 @@ class ManhwaDetailPopup extends StatelessWidget {
       'to_read': 'To Read',
     };
 
+    String readingLabel(Manhwa manhwa) {
+      final label = readingStatusLabels[manhwa.readingStatus] ?? "Not Read";
+
+      final showChapter = [
+        "reading",
+        "dropped",
+        "on_hold",
+      ].contains(manhwa.readingStatus);
+
+      return (manhwa.currentChapter > 0 && showChapter)
+          ? "$label: Ch ${manhwa.currentChapter}"
+          : label;
+    }
+
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.9,
       child: Padding(
@@ -132,7 +146,7 @@ class ManhwaDetailPopup extends StatelessWidget {
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: customChip(
-                            "${readingStatusLabels[manhwa.readingStatus]}${manhwa.currentChapter > 0 ? ": Ch ${manhwa.currentChapter}" : ""}",
+                            readingLabel(manhwa),
                             icon: Icons.edit,
                             shimmer: true,
                           ),
