@@ -70,4 +70,38 @@ class Manhwa {
       'categories': categories,
     },
   };
+
+  Manhwa copyWith({
+    int? id,
+    String? name,
+    String? synopsis,
+    int? yearReleased,
+    String? chapters,
+    int? chapterMin,
+    int? chapterMax,
+    String? imageUrl,
+    String? status,
+    String? rating,
+    List<String>? genres,
+    List<String>? categories,
+    int? currentChapter,
+    String? readingStatus,
+  }) {
+    return Manhwa(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      synopsis: synopsis ?? this.synopsis,
+      yearReleased: yearReleased ?? this.yearReleased,
+      chapters: chapters ?? this.chapters,
+      chapterMin: chapterMin ?? this.chapterMin,
+      chapterMax: chapterMax ?? this.chapterMax,
+      imageUrl: imageUrl ?? this.imageUrl,
+      status: status ?? this.status,
+      rating: rating ?? this.rating,
+      genres: genres ?? this.genres,
+      categories: categories ?? this.categories,
+      currentChapter: currentChapter ?? this.currentChapter,
+      readingStatus: readingStatus ?? this.readingStatus,
+    );
+  }
 }
