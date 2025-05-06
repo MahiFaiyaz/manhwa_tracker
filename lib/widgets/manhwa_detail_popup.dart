@@ -115,6 +115,13 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                 TextFormField(
                   initialValue: currentChapter.toString(),
                   keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(
+                      4,
+                    ), // max 4 digits → up to 9999
+                  ],
+
                   decoration: const InputDecoration(
                     labelText: 'Current Chapter',
                     labelStyle: TextStyle(color: Colors.white70),
@@ -134,10 +141,20 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                 child: const Text("Cancel"),
               ),
               ElevatedButton(
-                onPressed: () {
-                  // TODO: Save logic
+                onPressed: () async {
                   Navigator.pop(context);
-                  debugPrint("Saved: $readingStatus, chapter: $currentChapter");
+                  final success = await submitProgress(
+                    manhwaId: widget.manhwa.id,
+                    chapter: currentChapter,
+                    readingStatus: readingStatus,
+                  );
+                  if (!success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Failed to update progress"),
+                      ),
+                    );
+                  }
                 },
                 child: const Text("Save"),
               ),
