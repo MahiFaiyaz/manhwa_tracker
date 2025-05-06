@@ -97,7 +97,7 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<String>(
-                  dropdownColor: Colors.black.withAlpha((0.8 * 255).toInt()),
+                  dropdownColor: Colors.black.withAlpha((0.95 * 255).toInt()),
                   decoration: const InputDecoration(
                     labelText: 'Reading Status',
                     labelStyle: TextStyle(color: Colors.white70),
@@ -148,26 +148,35 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                 child: const Text("Cancel"),
               ),
               ElevatedButton(
-                onPressed: () async {
+                onPressed: () {
+                  // 1. Update UI first
                   setState(() {
                     localManhwa = localManhwa.copyWith(
                       readingStatus: readingStatus,
                       currentChapter: currentChapter,
                     );
                   });
-                  Navigator.pop(context);
-                  final success = await submitProgress(
+
+                  // 2. Then close the dialog
+                  Navigator.pop(context, {
+                    'readingStatus': readingStatus,
+                    'currentChapter': currentChapter,
+                  });
+
+                  // 3. Run the API call in the background
+                  submitProgress(
                     manhwaId: localManhwa.id,
                     chapter: currentChapter,
                     readingStatus: readingStatus,
-                  );
-                  if (mounted && !success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Failed to update progress"),
-                      ),
-                    );
-                  }
+                  ).then((success) {
+                    if (!success && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Failed to update progress"),
+                        ),
+                      );
+                    }
+                  });
                 },
                 child: const Text("Save"),
               ),
@@ -254,22 +263,35 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
-                          onTap: () {
-                            showGeneralDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              barrierLabel: "Progress Update",
-                              barrierColor: Colors.black38, // dark overlay
-                              pageBuilder: (_, __, ___) {
-                                return BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                    sigmaX: 6,
-                                    sigmaY: 6,
-                                  ), // blur strength
-                                  child: Center(child: buildEditDialog()),
+                          onTap: () async {
+                            final result =
+                                await showGeneralDialog<Map<String, dynamic>>(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  barrierLabel: "Progress Update",
+                                  barrierColor: Colors.black38,
+                                  pageBuilder: (_, __, ___) {
+                                    return BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                        sigmaX: 6,
+                                        sigmaY: 6,
+                                      ),
+                                      child: Center(child: buildEditDialog()),
+                                    );
+                                  },
                                 );
-                              },
-                            );
+
+                            // After the dialog is closed
+                            if (result != null && mounted) {
+                              setState(() {
+                                localManhwa = localManhwa.copyWith(
+                                  readingStatus:
+                                      result['readingStatus'] as String,
+                                  currentChapter:
+                                      result['currentChapter'] as int,
+                                );
+                              });
+                            }
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: customChip(
