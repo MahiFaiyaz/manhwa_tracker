@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import '../models/manhwa.dart';
 import 'custom_chip.dart';
+import 'dart:ui';
+import 'package:flutter/services.dart';
+import '../services/api_services.dart';
 
-class ManhwaDetailPopup extends StatelessWidget {
+class ManhwaDetailPopup extends StatefulWidget {
   final Manhwa manhwa;
-
   const ManhwaDetailPopup({super.key, required this.manhwa});
 
+  @override
+  State<ManhwaDetailPopup> createState() => _ManhwaDetailPopupState();
+}
+
+class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
   double _mapRatingToStars(String? rating) {
     switch (rating) {
       case 'Highly Recommended':
@@ -27,19 +34,19 @@ class ManhwaDetailPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = manhwa.name;
-    final imageUrl = manhwa.imageUrl.replaceFirst('.webp', 'l.webp');
-    final synopsis = manhwa.synopsis;
-    final rating = manhwa.rating;
-    final status = manhwa.status;
-    final chapters = switch (manhwa.chapters.toLowerCase()) {
+    final title = widget.manhwa.name;
+    final imageUrl = widget.manhwa.imageUrl.replaceFirst('.webp', 'l.webp');
+    final synopsis = widget.manhwa.synopsis;
+    final rating = widget.manhwa.rating;
+    final status = widget.manhwa.status;
+    final chapters = switch (widget.manhwa.chapters.toLowerCase()) {
       'more than 100' => '100+',
       'less than 100' => '< 100',
-      _ => manhwa.chapters,
+      _ => widget.manhwa.chapters,
     };
-    final yearReleased = manhwa.yearReleased;
-    final genres = List<String>.from(manhwa.genres);
-    final categories = List<String>.from(manhwa.categories);
+    final yearReleased = widget.manhwa.yearReleased;
+    final genres = List<String>.from(widget.manhwa.genres);
+    final categories = List<String>.from(widget.manhwa.categories);
 
     const readingStatusLabels = {
       'reading': 'Reading',
@@ -142,11 +149,25 @@ class ManhwaDetailPopup extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
                           onTap: () {
-                            // TODO: Show your bottom popup for editing reading status/chapter
+                            showGeneralDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              barrierLabel: "Progress Update",
+                              barrierColor: Colors.black38, // dark overlay
+                              pageBuilder: (_, __, ___) {
+                                return BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 6,
+                                    sigmaY: 6,
+                                  ), // blur strength
+                                  child: Center(child: buildEditDialog()),
+                                );
+                              },
+                            );
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: customChip(
-                            readingLabel(manhwa),
+                            readingLabel(widget.manhwa),
                             icon: Icons.edit,
                             shimmer: true,
                           ),
