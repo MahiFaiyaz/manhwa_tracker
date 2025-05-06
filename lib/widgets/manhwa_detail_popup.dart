@@ -71,6 +71,82 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
           : label;
     }
 
+    Widget buildEditDialog() {
+      String readingStatus = widget.manhwa.readingStatus;
+      int currentChapter = widget.manhwa.currentChapter;
+
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            backgroundColor: Colors.black.withAlpha((0.8 * 255).toInt()),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              "Update Progress",
+              style: TextStyle(color: Colors.white),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  dropdownColor: Colors.black.withAlpha((0.8 * 255).toInt()),
+                  decoration: const InputDecoration(
+                    labelText: 'Reading Status',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(),
+                  ),
+                  value: readingStatus,
+                  items:
+                      readingStatusLabels.entries.map((entry) {
+                        return DropdownMenuItem<String>(
+                          value: entry.key,
+                          child: Text(
+                            entry.value,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                  onChanged: (val) {
+                    if (val != null) setState(() => readingStatus = val);
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue: currentChapter.toString(),
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Current Chapter',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (val) {
+                    final parsed = int.tryParse(val);
+                    if (parsed != null) setState(() => currentChapter = parsed);
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: Save logic
+                  Navigator.pop(context);
+                  debugPrint("Saved: $readingStatus, chapter: $currentChapter");
+                },
+                child: const Text("Save"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.9,
       child: Padding(
