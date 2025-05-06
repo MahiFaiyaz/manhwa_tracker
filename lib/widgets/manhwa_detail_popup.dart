@@ -15,6 +15,13 @@ class ManhwaDetailPopup extends StatefulWidget {
 }
 
 class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
+  late Manhwa localManhwa;
+  @override
+  void initState() {
+    super.initState();
+    localManhwa = widget.manhwa;
+  }
+
   double _mapRatingToStars(String? rating) {
     switch (rating) {
       case 'Highly Recommended':
@@ -142,13 +149,19 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
               ),
               ElevatedButton(
                 onPressed: () async {
+                  setState(() {
+                    localManhwa = localManhwa.copyWith(
+                      readingStatus: readingStatus,
+                      currentChapter: currentChapter,
+                    );
+                  });
                   Navigator.pop(context);
                   final success = await submitProgress(
-                    manhwaId: widget.manhwa.id,
+                    manhwaId: localManhwa.id,
                     chapter: currentChapter,
                     readingStatus: readingStatus,
                   );
-                  if (!success) {
+                  if (mounted && !success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("Failed to update progress"),
@@ -260,7 +273,7 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: customChip(
-                            readingLabel(widget.manhwa),
+                            readingLabel(localManhwa),
                             icon: Icons.edit,
                             shimmer: true,
                           ),
