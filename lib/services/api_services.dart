@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/widgets.dart';
 import '../models/manhwa_filter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'auth_services.dart';
 
 Future<List<Map<String, dynamic>>> loadMockData(String filename) async {
   await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
@@ -174,5 +175,48 @@ Future<List<Manhwa>> fetchUserProgress({
     });
 
     return []; // safe default
+  }
+}
+
+Future<bool> submitProgress({
+  required int manhwaId,
+  required int chapter,
+  required String readingStatus,
+}) async {
+  try {
+    // First try using existing token
+    String? token = await getAuthToken();
+    if (token == null) throw Exception("Missing auth token");
+
+    // Helper function to send the POST request
+    Future<http.Response> sendRequest(String token) {
+      return http.post(
+        Uri.parse('$apiBaseUrl/progress'),
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': 'Bearer $token', // no Bearer
+        },
+        body: jsonEncode({
+          'manhwa_id': manhwaId,
+          'current_chapter': chapter,
+          'reading_status': readingStatus,
+        }),
+      );
+    }
+
+    // First try
+    var response = await sendRequest(token);
+    if (response.statusCode == 200) return true;
+
+    // Try refresh once if failed
+    await refreshAuthToken();
+    token = await getAuthToken();
+    if (token == null) throw Exception("Token refresh failed");
+
+    response = await sendRequest(token);
+    return response.statusCode == 200;
+  } catch (e) {
+    debugPrint("Progress update failed: $e");
+    return false;
   }
 }
