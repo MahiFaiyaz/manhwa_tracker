@@ -41,19 +41,19 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.manhwa.name;
-    final imageUrl = widget.manhwa.imageUrl.replaceFirst('.webp', 'l.webp');
-    final synopsis = widget.manhwa.synopsis;
-    final rating = widget.manhwa.rating;
-    final status = widget.manhwa.status;
-    final chapters = switch (widget.manhwa.chapters.toLowerCase()) {
+    final title = localManhwa.name;
+    final imageUrl = localManhwa.imageUrl.replaceFirst('.webp', 'l.webp');
+    final synopsis = localManhwa.synopsis;
+    final rating = localManhwa.rating;
+    final status = localManhwa.status;
+    final chapters = switch (localManhwa.chapters.toLowerCase()) {
       'more than 100' => '100+',
       'less than 100' => '< 100',
-      _ => widget.manhwa.chapters,
+      _ => localManhwa.chapters,
     };
-    final yearReleased = widget.manhwa.yearReleased;
-    final genres = List<String>.from(widget.manhwa.genres);
-    final categories = List<String>.from(widget.manhwa.categories);
+    final yearReleased = localManhwa.yearReleased;
+    final genres = List<String>.from(localManhwa.genres);
+    final categories = List<String>.from(localManhwa.categories);
 
     const readingStatusLabels = {
       'reading': 'Reading',
@@ -79,8 +79,8 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
     }
 
     Widget buildEditDialog() {
-      String readingStatus = widget.manhwa.readingStatus;
-      int currentChapter = widget.manhwa.currentChapter;
+      String readingStatus = localManhwa.readingStatus;
+      int currentChapter = localManhwa.currentChapter;
 
       return StatefulBuilder(
         builder: (context, setState) {
