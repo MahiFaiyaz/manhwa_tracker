@@ -6,7 +6,6 @@ import '../utils/config.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/widgets.dart';
 import '../models/manhwa_filter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_services.dart';
 
 Future<List<Map<String, dynamic>>> loadMockData(String filename) async {
