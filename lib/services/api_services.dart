@@ -112,8 +112,7 @@ Future<List<Manhwa>> fetchManhwas({
   required ManhwaFilter filter,
   void Function(String)? onFallback,
 }) async {
-  try {
-    String? token = await getAuthToken();
+  Future<List<Manhwa>> makeRequest({String? token}) async {
     final headers = {
       'Content-Type': 'application/json',
       if (token != null) 'auth-token': 'Bearer $token',
@@ -128,9 +127,30 @@ Future<List<Manhwa>> fetchManhwas({
       final List<dynamic> data = json.decode(response.body);
       final manhwas = data.map((json) => Manhwa.fromJson(json)).toList();
       return manhwas;
-    } else {
-      throw Exception('Bad status code: ${response.statusCode}');
     }
+    throw Exception('Bad status code: ${response.statusCode}');
+  }
+
+  try {
+    // 1. Try with current token
+    String? token = await getAuthToken();
+    if (token != null) {
+      try {
+        return await makeRequest(token: token);
+      } catch (_) {
+        // 2. Refresh token and retry
+        await refreshAuthToken();
+        token = await getAuthToken();
+        if (token != null) {
+          try {
+            return await makeRequest(token: token);
+          } catch (_) {
+            // fall through to unauthenticated
+          }
+        }
+      }
+    }
+    return await makeRequest(token: null);
   } catch (e) {
     debugPrint("Manhwa fetch failed: $e");
 
