@@ -147,21 +147,31 @@ Future<List<Manhwa>> fetchUserProgress({
   void Function(String)? onFallback,
 }) async {
   try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
+    String? token = await getAuthToken();
+    if (token == null) throw Exception("Missing auth token");
 
-    if (token == null) {
-      throw Exception("No auth token found.");
+    Future<http.Response> makeRequest(String token) {
+      return http.get(
+        Uri.parse('$apiBaseUrl/progress'),
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': 'Bearer $token',
+        },
+      );
     }
 
-    final response = await http.get(
-      Uri.parse('$apiBaseUrl/progress'),
-      headers: {
-        'Content-Type': 'application/json',
-        'auth-token': 'Bearer $token',
-      },
-    );
+    var response = await makeRequest(token);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Manhwa.fromJson(json)).toList();
+    }
 
+    // Try refresh once if failed
+    await refreshAuthToken();
+    token = await getAuthToken();
+    if (token == null) throw Exception("Token refresh failed");
+
+    response = await makeRequest(token);
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => Manhwa.fromJson(json)).toList();
