@@ -78,7 +78,7 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
           : label;
     }
 
-    Widget buildEditDialog() {
+    Widget buildEditDialog({required void Function(Manhwa) onSave}) {
       String readingStatus = localManhwa.readingStatus;
       int currentChapter = localManhwa.currentChapter;
 
@@ -162,7 +162,7 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                     'readingStatus': readingStatus,
                     'currentChapter': currentChapter,
                   });
-
+                  onSave(localManhwa);
                   // 3. Run the API call in the background
                   submitProgress(
                     manhwaId: localManhwa.id,
@@ -276,7 +276,16 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                                         sigmaX: 6,
                                         sigmaY: 6,
                                       ),
-                                      child: Center(child: buildEditDialog()),
+                                      child: Center(
+                                        child: buildEditDialog(
+                                          onSave: (updatedManhwa) {
+                                            Navigator.pop(
+                                              context,
+                                              updatedManhwa,
+                                            ); // this will pop the bottom sheet
+                                          },
+                                        ),
+                                      ),
                                     );
                                   },
                                 );
