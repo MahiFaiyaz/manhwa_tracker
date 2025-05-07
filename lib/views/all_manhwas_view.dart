@@ -19,7 +19,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
   DateTime? lastRefreshed;
   Timer? cooldownTimer;
   int cooldownSecondsRemaining = 0;
-  static const int cooldownDuration = 300; // 5 mins
+  static const int cooldownDuration = 30; // 5 mins
   final TextEditingController _searchController = TextEditingController();
   List<Manhwa> filteredManhwas = [];
 
