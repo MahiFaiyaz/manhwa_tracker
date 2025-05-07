@@ -123,7 +123,6 @@ class _LibraryViewState extends State<LibraryView> {
         _jumpToStatus(selectedStatus);
       });
     } catch (e) {
-      print(e);
       _showSnackBar("Failed to load your library.");
       setState(() => isLoading = false);
     }
@@ -152,7 +151,6 @@ class _LibraryViewState extends State<LibraryView> {
       Scrollable.ensureVisible(
         key.currentContext!,
         duration: const Duration(milliseconds: 300),
-        alignment: 0.1,
       );
       setState(() => selectedStatus = status);
     }
