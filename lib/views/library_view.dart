@@ -6,6 +6,7 @@ import '../models/manhwa.dart';
 import '../services/api_services.dart';
 import '../widgets/manhwa_card.dart';
 import '../widgets/shimmer_card.dart';
+import 'dart:async';
 
 class LibraryView extends StatefulWidget {
   const LibraryView({super.key});
@@ -21,6 +22,10 @@ class _LibraryViewState extends State<LibraryView> {
   final TextEditingController _searchController = TextEditingController();
   List<Manhwa> filteredManhwas = [];
   List<Manhwa> libraryManhwas = [];
+  DateTime? lastRefreshed;
+  Timer? cooldownTimer;
+  int cooldownSecondsRemaining = 0;
+  static const int cooldownDuration = 5; // 5 mins
 
   @override
   void initState() {
@@ -59,7 +64,16 @@ class _LibraryViewState extends State<LibraryView> {
     setState(() => _isLoggedIn = false);
   }
 
+  void refresh() async {
+    await refreshAuthToken();
+  }
+
   Future<void> fetchLibrary() async {
+    setState(() {
+      isLoading = true;
+      lastRefreshed = DateTime.now();
+      cooldownSecondsRemaining = cooldownDuration;
+    });
     try {
       final result = await fetchUserProgress(
         onFallback: (msg) => _showSnackBar(msg),
@@ -73,6 +87,25 @@ class _LibraryViewState extends State<LibraryView> {
       _showSnackBar("Failed to load your library.");
       setState(() => isLoading = false);
     }
+    cooldownTimer?.cancel(); // cancel any existing one
+    cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (cooldownSecondsRemaining <= 1) {
+        timer.cancel();
+        setState(() {
+          cooldownSecondsRemaining = 0;
+        });
+      } else {
+        setState(() {
+          cooldownSecondsRemaining--;
+        });
+      }
+    });
+  }
+
+  String formatDuration(int totalSeconds) {
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
   }
 
   void _showSnackBar(String message) {
@@ -81,6 +114,8 @@ class _LibraryViewState extends State<LibraryView> {
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
   }
+
+  bool get canRefresh => cooldownSecondsRemaining == 0;
 
   void _search(String query) {
     final trimmed = query.toLowerCase().trim();
@@ -118,46 +153,62 @@ class _LibraryViewState extends State<LibraryView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Library'),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: PopupMenuButton<String>(
+            offset: const Offset(0, 44),
+            child: Icon(
+              Icons.person,
+              color: Colors.deepPurple.shade300,
+              size: 40,
+            ),
+            onSelected: (value) {
+              if (value == 'logout') handleLogout();
+            },
+            itemBuilder:
+                (context) => [
+                  if (userEmail != null)
+                    PopupMenuItem<String>(
+                      height: 16,
+                      enabled: false,
+                      child: Text(
+                        userEmail!,
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  const PopupMenuItem<String>(
+                    enabled: false,
+                    height: 1,
+                    padding: EdgeInsets.zero,
+                    child: Divider(thickness: 2),
+                  ),
+                  const PopupMenuItem<String>(
+                    height: 16,
+                    value: 'logout',
+                    child: Text('Log Out'),
+                  ),
+                ],
+          ),
+        ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: PopupMenuButton<String>(
-              offset: const Offset(0, 44),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple.shade300,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person, color: Colors.white, size: 20),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               ),
-              onSelected: (value) {
-                if (value == 'logout') handleLogout();
-              },
-              itemBuilder:
-                  (context) => [
-                    if (userEmail != null)
-                      PopupMenuItem<String>(
-                        height: 16,
-                        enabled: false,
-                        child: Text(
-                          userEmail!,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    const PopupMenuItem<String>(
-                      enabled: false,
-                      height: 1,
-                      padding: EdgeInsets.zero,
-                      child: Divider(thickness: 2),
-                    ),
-                    const PopupMenuItem<String>(
-                      height: 16,
-                      value: 'logout',
-                      child: Text('Log Out'),
-                    ),
-                  ],
+              onPressed: canRefresh ? fetchLibrary : null,
+              child: Row(
+                children: [
+                  const Icon(Icons.refresh),
+                  const SizedBox(width: 8),
+                  Text(
+                    canRefresh
+                        ? "Refresh"
+                        : formatDuration(cooldownSecondsRemaining),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
