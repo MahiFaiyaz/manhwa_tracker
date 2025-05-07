@@ -113,12 +113,14 @@ Future<List<Manhwa>> fetchManhwas({
   void Function(String)? onFallback,
 }) async {
   try {
+    String? token = await getAuthToken();
+    final headers = {
+      'Content-Type': 'application/json',
+      if (token != null) 'auth-token': 'Bearer $token',
+    };
     final response = await http.post(
       Uri.parse('$apiBaseUrl/manhwas'),
-      headers: {
-        'Content-Type': 'application/json',
-        // 'auth-token': 'your_token_here', // optional
-      },
+      headers: headers,
       body: jsonEncode(filter.toJson()),
     );
 
