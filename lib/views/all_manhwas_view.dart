@@ -102,6 +102,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: const Text('All Manhwas'),
         actions: [
           Padding(
