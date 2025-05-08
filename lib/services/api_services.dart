@@ -251,3 +251,36 @@ Future<bool> submitProgress({
     return false;
   }
 }
+
+Future<bool> deleteProgress(int manhwaId) async {
+  try {
+    String? token = await getAuthToken();
+    if (token == null) throw Exception("Missing auth token");
+
+    // Helper function to send the POST request
+    Future<http.Response> sendRequest(String token) {
+      return http.delete(
+        Uri.parse('$apiBaseUrl/progress/$manhwaId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': 'Bearer $token',
+        },
+      );
+    }
+
+    // First try
+    var response = await sendRequest(token);
+    if (response.statusCode == 200) return true;
+
+    // Try refresh once if failed
+    await refreshAuthToken();
+    token = await getAuthToken();
+    if (token == null) throw Exception("Token refresh failed");
+
+    response = await sendRequest(token);
+    return response.statusCode == 200;
+  } catch (e) {
+    debugPrint("Progress delete failed: $e");
+    return false;
+  }
+}
