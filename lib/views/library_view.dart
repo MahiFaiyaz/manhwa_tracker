@@ -138,7 +138,7 @@ class _LibraryViewState extends State<LibraryView> {
       if (context == null) continue;
 
       final box = context.findRenderObject() as RenderBox?;
-      if (box != null && box.localToGlobal(Offset.zero).dy < 150) {
+      if (box != null && box.localToGlobal(Offset.zero).dy < 180) {
         if (selectedStatus != status) {
           setState(() => selectedStatus = status);
         }
