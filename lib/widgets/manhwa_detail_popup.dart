@@ -78,43 +78,11 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
           : label;
     }
 
-    void handleDelete() {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.black.withAlpha((0.8 * 255).toInt()),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: const Text(
-              "Delete Progress",
-              style: TextStyle(color: Colors.white),
-            ),
-            content: const Text(
-              "Are you sure you want to delete this progress?",
-              style: TextStyle(color: Colors.white70),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context, true);
-                },
-                child: const Text("Delete"),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
     Widget buildEditDialog({required void Function(Manhwa) onSave}) {
-      String readingStatus = localManhwa.readingStatus;
+      String readingStatus =
+          localManhwa.readingStatus == 'not_read'
+              ? 'reading'
+              : localManhwa.readingStatus;
       int currentChapter = localManhwa.currentChapter;
 
       return StatefulBuilder(
@@ -182,7 +150,62 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
             ),
             actions: [
               TextButton(
-                onPressed: () => handleDelete(),
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.black.withAlpha(
+                          (0.8 * 255).toInt(),
+                        ),
+                        title: const Text(
+                          "Delete Progress",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        content: const Text(
+                          "Are you sure you want to delete this from your library?",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text("Cancel"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text("Delete"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (confirmed != true) return; // cancel
+                  // 1. Update UI first
+                  setState(() {
+                    localManhwa = localManhwa.copyWith(
+                      readingStatus: 'not_read',
+                      currentChapter: 0,
+                    );
+                  });
+
+                  // 2. Then close the dialog
+                  Navigator.pop(context, {
+                    'readingStatus': readingStatus,
+                    'currentChapter': currentChapter,
+                  });
+                  onSave(localManhwa);
+                  // 3. Run the API call in the background
+                  deleteProgress(localManhwa.id).then((success) {
+                    if (!success && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Failed to delete progress"),
+                        ),
+                      );
+                    }
+                  });
+                },
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 child: const Text("Delete"),
               ),
