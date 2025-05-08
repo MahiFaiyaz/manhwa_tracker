@@ -410,7 +410,9 @@ class _LibraryViewState extends State<LibraryView> {
                                     key: chipKey, // ✅ assign key here
                                     label: Text(label),
                                     selected: isSelected,
+                                    showCheckmark: false,
                                     onSelected: (_) => _jumpToStatus(status),
+                                    selectedColor: Colors.deepPurple.shade300,
                                   ),
                                 );
                               })
