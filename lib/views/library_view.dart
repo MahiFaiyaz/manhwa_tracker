@@ -28,6 +28,7 @@ class _LibraryViewState extends State<LibraryView> {
   DateTime? lastRefreshed;
   Timer? cooldownTimer;
   static const int cooldownDuration = 5; // 5 mins
+  String _searchQuery = '';
 
   final statusOrder = [
     'to_read',
@@ -149,6 +150,7 @@ class _LibraryViewState extends State<LibraryView> {
     final key = sectionKeys[status];
     if (key != null && key.currentContext != null) {
       Scrollable.ensureVisible(
+        alignment: -0.03,
         key.currentContext!,
         duration: const Duration(milliseconds: 300),
       );
@@ -272,15 +274,57 @@ class _LibraryViewState extends State<LibraryView> {
               )
               : Column(
                 children: [
+                  // Search Bar
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      top: 4,
+                      bottom: 8,
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value.trim().toLowerCase();
+                        });
+                      },
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Search titles...',
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade900,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    margin: const EdgeInsets.only(top: 12, bottom: 8),
+                    margin: const EdgeInsets.only(bottom: 4),
                     height: 40,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children:
                           manhwasByStatus.entries
-                              .where((entry) => entry.value.isNotEmpty)
+                              .where((entry) {
+                                final filtered =
+                                    entry.value
+                                        .where(
+                                          (m) => m.name.toLowerCase().contains(
+                                            _searchQuery,
+                                          ),
+                                        )
+                                        .toList();
+                                return filtered.isNotEmpty;
+                              })
                               .map((entry) {
                                 final status = entry.key;
                                 final label = statusLabels[status]!;
@@ -309,54 +353,57 @@ class _LibraryViewState extends State<LibraryView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children:
-                            manhwasByStatus.entries
-                                .where((entry) => entry.value.isNotEmpty)
-                                .map((entry) {
-                                  final status = entry.key;
-                                  final items = entry.value;
-                                  final key = GlobalKey();
-                                  sectionKeys[status] = key;
+                            manhwasByStatus.entries.map((entry) {
+                              final status = entry.key;
+                              final key = GlobalKey();
+                              final items =
+                                  entry.value
+                                      .where(
+                                        (m) => m.name.toLowerCase().contains(
+                                          _searchQuery,
+                                        ),
+                                      )
+                                      .toList();
 
-                                  return Column(
-                                    key: key,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
-                                        child: Text(
-                                          statusLabels[status]!,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                              if (items.isEmpty) return const SizedBox.shrink();
+                              sectionKeys[status] = key;
+
+                              return Column(
+                                key: key,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    child: Text(
+                                      statusLabels[status]!,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
-                                      GridView.builder(
-                                        itemCount: items.length,
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        gridDelegate:
-                                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 3,
-                                              mainAxisSpacing: 12,
-                                              crossAxisSpacing: 12,
-                                              childAspectRatio: 2 / 3,
-                                            ),
-                                        itemBuilder: (context, index) {
-                                          return ManhwaCard(
-                                            manhwa: items[index],
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                })
-                                .toList(),
+                                    ),
+                                  ),
+                                  GridView.builder(
+                                    itemCount: items.length,
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3,
+                                          mainAxisSpacing: 12,
+                                          crossAxisSpacing: 12,
+                                          childAspectRatio: 2 / 3,
+                                        ),
+                                    itemBuilder: (context, index) {
+                                      return ManhwaCard(manhwa: items[index]);
+                                    },
+                                  ),
+                                ],
+                              );
+                            }).toList(),
                       ),
                     ),
                   ),
