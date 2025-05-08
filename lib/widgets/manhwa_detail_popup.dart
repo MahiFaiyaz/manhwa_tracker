@@ -105,15 +105,18 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                   ),
                   value: readingStatus,
                   items:
-                      readingStatusLabels.entries.map((entry) {
-                        return DropdownMenuItem<String>(
-                          value: entry.key,
-                          child: Text(
-                            entry.value,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }).toList(),
+                      readingStatusLabels.entries
+                          .where((entry) => entry.key != 'not_read')
+                          .map((entry) {
+                            return DropdownMenuItem<String>(
+                              value: entry.key,
+                              child: Text(
+                                entry.value,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            );
+                          })
+                          .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => readingStatus = val);
                   },
