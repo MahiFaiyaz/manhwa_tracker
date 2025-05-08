@@ -32,6 +32,7 @@ class _LibraryViewState extends State<LibraryView> {
   final ScrollController _chipScrollController = ScrollController();
   final Map<String, GlobalKey> chipKeys = {};
   final GlobalKey _chipListKey = GlobalKey();
+  bool _isJumpingToStatus = false;
 
   final statusOrder = [
     'to_read',
@@ -142,8 +143,8 @@ class _LibraryViewState extends State<LibraryView> {
       if (context == null) continue;
 
       final box = context.findRenderObject() as RenderBox?;
-      if (box != null && box.localToGlobal(Offset.zero).dy < 180) {
-        if (selectedStatus != status) {
+      if (box != null && box.localToGlobal(Offset.zero).dy < 186) {
+        if (!_isJumpingToStatus && selectedStatus != status) {
           setState(() => selectedStatus = status);
 
           // Scroll chip into view
@@ -183,13 +184,19 @@ class _LibraryViewState extends State<LibraryView> {
 
   void _jumpToStatus(String status) {
     final key = sectionKeys[status];
+
+    // Begin jump: activate flag
+    setState(() {
+      selectedStatus = status;
+      _isJumpingToStatus = true;
+    });
+
     if (key != null && key.currentContext != null) {
       Scrollable.ensureVisible(
         key.currentContext!,
         duration: const Duration(milliseconds: 300),
-        alignment: -0.04,
+        alignment: -0.02,
       );
-      setState(() => selectedStatus = status);
     }
 
     // Center the chip in view
@@ -221,6 +228,11 @@ class _LibraryViewState extends State<LibraryView> {
           curve: Curves.easeOut,
         );
       }
+
+      // Reset flag after scroll finishes
+      Future.delayed(const Duration(milliseconds: 350), () {
+        _isJumpingToStatus = false;
+      });
     });
   }
 
