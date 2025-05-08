@@ -29,6 +29,9 @@ class _LibraryViewState extends State<LibraryView> {
   Timer? cooldownTimer;
   static const int cooldownDuration = 5; // 5 mins
   String _searchQuery = '';
+  final ScrollController _chipScrollController = ScrollController();
+  final Map<String, GlobalKey> chipKeys = {};
+  final GlobalKey _chipListKey = GlobalKey();
 
   final statusOrder = [
     'to_read',
@@ -57,6 +60,7 @@ class _LibraryViewState extends State<LibraryView> {
 
   @override
   void dispose() {
+    _chipScrollController.dispose();
     _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
@@ -141,6 +145,37 @@ class _LibraryViewState extends State<LibraryView> {
       if (box != null && box.localToGlobal(Offset.zero).dy < 180) {
         if (selectedStatus != status) {
           setState(() => selectedStatus = status);
+
+          // Scroll chip into view
+          Future.delayed(Duration.zero, () {
+            final renderBox =
+                chipKeys[status]?.currentContext?.findRenderObject()
+                    as RenderBox?;
+            final scrollBox =
+                _chipListKey.currentContext?.findRenderObject() as RenderBox?;
+            if (renderBox != null && scrollBox != null) {
+              final chipOffset =
+                  renderBox.localToGlobal(Offset.zero, ancestor: scrollBox).dx;
+              final chipWidth = renderBox.size.width;
+              final scrollViewWidth = scrollBox.size.width;
+
+              final targetOffset =
+                  _chipScrollController.offset +
+                  chipOffset +
+                  chipWidth / 2 -
+                  scrollViewWidth / 2;
+              final clamped = targetOffset.clamp(
+                0.0,
+                _chipScrollController.position.maxScrollExtent,
+              );
+
+              _chipScrollController.animateTo(
+                clamped,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+              );
+            }
+          });
         }
       }
     }
@@ -150,12 +185,43 @@ class _LibraryViewState extends State<LibraryView> {
     final key = sectionKeys[status];
     if (key != null && key.currentContext != null) {
       Scrollable.ensureVisible(
-        alignment: -0.03,
         key.currentContext!,
         duration: const Duration(milliseconds: 300),
+        alignment: -0.03,
       );
       setState(() => selectedStatus = status);
     }
+
+    // Center the chip in view
+    Future.delayed(Duration.zero, () {
+      final renderBox =
+          chipKeys[status]?.currentContext?.findRenderObject() as RenderBox?;
+      final scrollBox =
+          _chipListKey.currentContext?.findRenderObject() as RenderBox?;
+
+      if (renderBox != null && scrollBox != null) {
+        final chipOffset =
+            renderBox.localToGlobal(Offset.zero, ancestor: scrollBox).dx;
+        final chipWidth = renderBox.size.width;
+        final scrollViewWidth = scrollBox.size.width;
+
+        final targetOffset =
+            _chipScrollController.offset +
+            chipOffset +
+            chipWidth / 2 -
+            scrollViewWidth / 2;
+        final clamped = targetOffset.clamp(
+          0.0,
+          _chipScrollController.position.maxScrollExtent,
+        );
+
+        _chipScrollController.animateTo(
+          clamped,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   bool get canRefresh => cooldownSecondsRemaining == 0;
@@ -311,6 +377,8 @@ class _LibraryViewState extends State<LibraryView> {
                     margin: const EdgeInsets.only(bottom: 4),
                     height: 40,
                     child: ListView(
+                      key: _chipListKey, // ✅ assign key here
+                      controller: _chipScrollController,
                       scrollDirection: Axis.horizontal,
                       children:
                           manhwasByStatus.entries
@@ -329,11 +397,17 @@ class _LibraryViewState extends State<LibraryView> {
                                 final status = entry.key;
                                 final label = statusLabels[status]!;
                                 final isSelected = selectedStatus == status;
+                                final chipKey = chipKeys.putIfAbsent(
+                                  status,
+                                  () => GlobalKey(),
+                                );
+
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 4,
                                   ),
                                   child: ChoiceChip(
+                                    key: chipKey, // ✅ assign key here
                                     label: Text(label),
                                     selected: isSelected,
                                     onSelected: (_) => _jumpToStatus(status),
