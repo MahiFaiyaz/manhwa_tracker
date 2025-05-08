@@ -78,6 +78,41 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
           : label;
     }
 
+    void handleDelete() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.black.withAlpha((0.8 * 255).toInt()),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              "Delete Progress",
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              "Are you sure you want to delete this progress?",
+              style: TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context, true);
+                },
+                child: const Text("Delete"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     Widget buildEditDialog({required void Function(Manhwa) onSave}) {
       String readingStatus = localManhwa.readingStatus;
       int currentChapter = localManhwa.currentChapter;
@@ -146,6 +181,14 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
               ],
             ),
             actions: [
+              TextButton(
+                onPressed: () => handleDelete(),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text("Delete"),
+              ),
+
+              // Spacer to push Cancel & Save to the right
+              const Spacer(),
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),
