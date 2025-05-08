@@ -23,8 +23,8 @@ class _ManhwaCardState extends State<ManhwaCard> {
   Widget build(BuildContext context) {
     final title = localManhwa.name;
     final imageUrl = localManhwa.imageUrl;
-    final rating = localManhwa.rating;
-    final status = localManhwa.status;
+    // final rating = localManhwa.rating;
+    // final status = localManhwa.status;
 
     return GestureDetector(
       onTap: () async {
@@ -34,7 +34,7 @@ class _ManhwaCardState extends State<ManhwaCard> {
           showDragHandle: true,
           builder: (context) => ManhwaDetailPopup(manhwa: localManhwa),
         );
-        if (updated != null) {
+        if (updated != null && mounted) {
           setState(() {
             localManhwa = updated;
           });
