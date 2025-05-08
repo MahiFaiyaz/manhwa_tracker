@@ -187,7 +187,7 @@ class _LibraryViewState extends State<LibraryView> {
       Scrollable.ensureVisible(
         key.currentContext!,
         duration: const Duration(milliseconds: 300),
-        alignment: -0.03,
+        alignment: -0.04,
       );
       setState(() => selectedStatus = status);
     }
