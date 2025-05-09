@@ -5,6 +5,7 @@ import 'custom_chip.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import '../services/api_services.dart';
+import '../dialog/loading_screen.dart';
 
 class ManhwaDetailPopup extends StatefulWidget {
   final Manhwa manhwa;
@@ -181,30 +182,42 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                   );
 
                   if (confirmed != true) return; // cancel
-                  // 1. Update UI first
-                  setState(() {
-                    localManhwa = localManhwa.copyWith(
-                      readingStatus: 'not_read',
-                      currentChapter: 0,
-                    );
-                  });
 
-                  // 2. Then close the dialog
-                  Navigator.pop(context, {
-                    'readingStatus': readingStatus,
-                    'currentChapter': currentChapter,
-                  });
-                  onSave(localManhwa);
-                  // 3. Run the API call in the background
-                  deleteProgress(localManhwa.id).then((success) {
-                    if (!success && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Failed to delete progress"),
-                        ),
+                  LoadingScreen.instance().show(
+                    context: context,
+                    text: "Deleting progress...",
+                  );
+                  final success = await deleteProgress(localManhwa.id);
+                  print(success);
+
+                  if (success) {
+                    setState(() {
+                      localManhwa = localManhwa.copyWith(
+                        readingStatus: 'not_read',
+                        currentChapter: 0,
                       );
-                    }
-                  });
+                    });
+
+                    print("Deleted progress successfully");
+                    LoadingScreen.instance().hide();
+                    print(context);
+
+                    // 2. Then close the dialog
+                    Navigator.pop(context, {
+                      'readingStatus': readingStatus,
+                      'currentChapter': currentChapter,
+                    });
+                    // closes the bottom sheet
+                    onSave(localManhwa);
+                  } else {
+                    print("Failed to delete progress");
+                    LoadingScreen.instance().hide();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Failed to delete progress"),
+                      ),
+                    );
+                  }
                 },
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 child: const Text("Delete"),
