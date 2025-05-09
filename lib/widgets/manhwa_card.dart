@@ -4,8 +4,9 @@ import '../models/manhwa.dart';
 
 class ManhwaCard extends StatefulWidget {
   final Manhwa manhwa;
+  final VoidCallback? onLibraryUpdate;
 
-  const ManhwaCard({super.key, required this.manhwa});
+  const ManhwaCard({super.key, required this.manhwa, this.onLibraryUpdate});
   @override
   State<ManhwaCard> createState() => _ManhwaCardState();
 }
@@ -28,16 +29,21 @@ class _ManhwaCardState extends State<ManhwaCard> {
 
     return GestureDetector(
       onTap: () async {
-        final updated = await showModalBottomSheet<Manhwa>(
+        final result = await showModalBottomSheet<Manhwa>(
           context: context,
           isScrollControlled: true,
           showDragHandle: true,
           builder: (context) => ManhwaDetailPopup(manhwa: localManhwa),
         );
-        if (updated != null && mounted) {
+        if (result != null && mounted) {
+          final updated = localManhwa.copyWith(
+            readingStatus: result.readingStatus,
+            currentChapter: result.currentChapter,
+          );
           setState(() {
             localManhwa = updated;
           });
+          widget.onLibraryUpdate?.call();
         }
       },
       child: ClipRRect(
