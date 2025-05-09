@@ -486,7 +486,10 @@ class _LibraryViewState extends State<LibraryView> {
                                           childAspectRatio: 2 / 3,
                                         ),
                                     itemBuilder: (context, index) {
-                                      return ManhwaCard(manhwa: items[index]);
+                                      return ManhwaCard(
+                                        manhwa: items[index],
+                                        onLibraryUpdate: _fetchLibrary,
+                                      );
                                     },
                                   ),
                                 ],
