@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/manhwa.dart';
 import '../services/api_services.dart';
 import '../widgets/manhwa_card.dart';
-import '../widgets/shimmer_card.dart';
 import 'dart:async';
 
 class LibraryView extends StatefulWidget {
@@ -88,6 +87,7 @@ class LibraryViewState extends State<LibraryView> {
     setState(() {
       isLoading = true;
     });
+    LoadingScreen.instance().show(context: context, text: 'Loading library...');
     try {
       final result = await fetchUserProgress();
       result.sort(
@@ -118,6 +118,8 @@ class LibraryViewState extends State<LibraryView> {
     } catch (e) {
       _showSnackBar("Failed to load your library.");
       setState(() => isLoading = false);
+    } finally {
+      LoadingScreen.instance().hide();
     }
   }
 
@@ -341,187 +343,157 @@ class LibraryViewState extends State<LibraryView> {
           ),
         ),
       ),
-      body:
-          isLoading
-              ? GridView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: 12,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 2 / 3,
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 4,
+              bottom: 8,
+            ),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.trim().toLowerCase();
+                });
+              },
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Search titles...',
+                hintStyle: const TextStyle(color: Colors.white54),
+                prefixIcon: const Icon(Icons.search, color: Colors.white),
+                filled: true,
+                fillColor: Colors.grey.shade900,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
-                itemBuilder: (_, __) => buildShimmerCard(),
-              )
-              : Column(
-                children: [
-                  // Search Bar
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16.0,
-                      right: 16.0,
-                      top: 4,
-                      bottom: 8,
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value.trim().toLowerCase();
-                        });
-                      },
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: 'Search titles...',
-                        hintStyle: const TextStyle(color: Colors.white54),
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: Colors.white,
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey.shade900,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    margin: const EdgeInsets.only(bottom: 4),
-                    height: 40,
-                    child: ListView(
-                      key: _chipListKey, // ✅ assign key here
-                      controller: _chipScrollController,
-                      scrollDirection: Axis.horizontal,
-                      children:
-                          manhwasByStatus.entries
-                              .where((entry) {
-                                final filtered =
-                                    entry.value
-                                        .where(
-                                          (m) => m.name.toLowerCase().contains(
-                                            _searchQuery,
-                                          ),
-                                        )
-                                        .toList();
-                                return filtered.isNotEmpty;
-                              })
-                              .map((entry) {
-                                final status = entry.key;
-                                final label = statusLabels[status]!;
-                                final isSelected = selectedStatus == status;
-                                final chipKey = chipKeys.putIfAbsent(
-                                  status,
-                                  () => GlobalKey(),
-                                );
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            margin: const EdgeInsets.only(bottom: 4),
+            height: 40,
+            child: ListView(
+              key: _chipListKey, // ✅ assign key here
+              controller: _chipScrollController,
+              scrollDirection: Axis.horizontal,
+              children:
+                  manhwasByStatus.entries
+                      .where((entry) {
+                        final filtered =
+                            entry.value
+                                .where(
+                                  (m) => m.name.toLowerCase().contains(
+                                    _searchQuery,
+                                  ),
+                                )
+                                .toList();
+                        return filtered.isNotEmpty;
+                      })
+                      .map((entry) {
+                        final status = entry.key;
+                        final label = statusLabels[status]!;
+                        final isSelected = selectedStatus == status;
+                        final chipKey = chipKeys.putIfAbsent(
+                          status,
+                          () => GlobalKey(),
+                        );
 
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  child: ChoiceChip(
-                                    key: chipKey, // ✅ assign key here
-                                    label: Text(label),
-                                    selected: isSelected,
-                                    showCheckmark: false,
-                                    onSelected: (_) => _jumpToStatus(status),
-                                    selectedColor: Colors.deepPurple.shade300,
-                                  ),
-                                );
-                              })
-                              .toList(),
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: ChoiceChip(
+                            key: chipKey, // ✅ assign key here
+                            label: Text(label),
+                            selected: isSelected,
+                            showCheckmark: false,
+                            onSelected: (_) => _jumpToStatus(status),
+                            selectedColor: Colors.deepPurple.shade300,
+                          ),
+                        );
+                      })
+                      .toList(),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (manhwasByStatus.values.every((list) => list.isEmpty))
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 32),
+                        child: Text(
+                          "Library is empty. Start tracking!",
+                          style: TextStyle(color: Colors.white70, fontSize: 32),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      child: Column(
+                    )
+                  else
+                    ...manhwasByStatus.entries.map((entry) {
+                      final status = entry.key;
+                      final key = GlobalKey();
+                      final items =
+                          entry.value
+                              .where(
+                                (m) =>
+                                    m.name.toLowerCase().contains(_searchQuery),
+                              )
+                              .toList();
+
+                      if (items.isEmpty) return const SizedBox.shrink();
+                      sectionKeys[status] = key;
+
+                      return Column(
+                        key: key,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (manhwasByStatus.values.every(
-                            (list) => list.isEmpty,
-                          ))
-                            const Center(
-                              child: Padding(
-                                padding: EdgeInsets.only(top: 32),
-                                child: Text(
-                                  "Library is empty. Start tracking!",
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 32,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Text(
+                              statusLabels[status]!,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
-                            )
-                          else
-                            ...manhwasByStatus.entries.map((entry) {
-                              final status = entry.key;
-                              final key = GlobalKey();
-                              final items =
-                                  entry.value
-                                      .where(
-                                        (m) => m.name.toLowerCase().contains(
-                                          _searchQuery,
-                                        ),
-                                      )
-                                      .toList();
-
-                              if (items.isEmpty) return const SizedBox.shrink();
-                              sectionKeys[status] = key;
-
-                              return Column(
-                                key: key,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                    ),
-                                    child: Text(
-                                      statusLabels[status]!,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  GridView.builder(
-                                    itemCount: items.length,
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          mainAxisSpacing: 12,
-                                          crossAxisSpacing: 12,
-                                          childAspectRatio: 2 / 3,
-                                        ),
-                                    itemBuilder: (context, index) {
-                                      return ManhwaCard(
-                                        manhwa: items[index],
-                                        onLibraryUpdate: _fetchLibrary,
-                                      );
-                                    },
-                                  ),
-                                ],
+                            ),
+                          ),
+                          GridView.builder(
+                            itemCount: items.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  childAspectRatio: 2 / 3,
+                                ),
+                            itemBuilder: (context, index) {
+                              return ManhwaCard(
+                                manhwa: items[index],
+                                onLibraryUpdate: _fetchLibrary,
                               );
-                            }).toList(),
+                            },
+                          ),
                         ],
-                      ),
-                    ),
-                  ),
+                      );
+                    }).toList(),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
