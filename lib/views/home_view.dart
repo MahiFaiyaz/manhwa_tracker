@@ -40,36 +40,28 @@ class _HomeViewState extends State<HomeView> {
       isLoading = true;
     });
 
-    late List<Genre> loadedGenres;
-    late List<Category> loadedCategories;
-    late List<Status> loadedStatus;
-    late List<Rating> loadedRatings;
+    try {
+      final results = await Future.wait([
+        fetchGenres(onFallback: _showSnackBar),
+        fetchCategories(onFallback: _showSnackBar),
+        fetchStatus(onFallback: _showSnackBar),
+        fetchRatings(onFallback: _showSnackBar),
+      ]);
 
-    // Run all fetch calls in parallel
-    await Future.wait([
-      fetchGenres(
-        onFallback: _showSnackBar,
-      ).then((result) => loadedGenres = result),
-      fetchCategories(
-        onFallback: _showSnackBar,
-      ).then((result) => loadedCategories = result),
-      fetchStatus(
-        onFallback: _showSnackBar,
-      ).then((result) => loadedStatus = result),
-      fetchRatings(
-        onFallback: _showSnackBar,
-      ).then((result) => loadedRatings = result),
-    ]);
+      if (!mounted) return;
 
-    if (!mounted) return;
+      setState(() {
+        genres = results[0] as List<Genre>;
+        categories = results[1] as List<Category>;
+        status = results[2] as List<Status>;
+        ratings = results[3] as List<Rating>;
 
-    setState(() {
-      genres = loadedGenres;
-      categories = loadedCategories;
-      status = loadedStatus;
-      ratings = loadedRatings;
-      isLoading = false;
-    });
+        isLoading = false;
+      });
+    } catch (e) {
+      _showSnackBar("Failed to load filter data.");
+      setState(() => isLoading = false);
+    }
   }
 
   void _showSnackBar(String message) {
