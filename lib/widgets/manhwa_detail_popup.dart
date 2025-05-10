@@ -150,116 +150,125 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
               ],
             ),
             actions: [
-              TextButton(
-                onPressed: () async {
-                  final confirmed = await showDialog<bool>(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        backgroundColor: Colors.black.withAlpha(
-                          (0.8 * 255).toInt(),
-                        ),
-                        title: const Text(
-                          "Delete Progress",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        content: const Text(
-                          "Are you sure you want to delete this from your library?",
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text("Cancel"),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text("Delete"),
-                          ),
-                        ],
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.black.withAlpha(
+                              (0.8 * 255).toInt(),
+                            ),
+                            title: const Text(
+                              "Delete Progress",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            content: const Text(
+                              "Are you sure you want to delete this from your library?",
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text("Delete"),
+                              ),
+                            ],
+                          );
+                        },
                       );
+
+                      if (confirmed != true) return; // cancel
+
+                      LoadingScreen.instance().show(
+                        context: context,
+                        text: "Deleting progress...",
+                      );
+                      final success = await deleteProgress(localManhwa.id);
+
+                      if (success) {
+                        setState(() {
+                          localManhwa = localManhwa.copyWith(
+                            readingStatus: 'not_read',
+                            currentChapter: 0,
+                          );
+                        });
+                        LoadingScreen.instance().hide();
+                        if (context.mounted) {
+                          Navigator.pop(context, {
+                            'readingStatus': readingStatus,
+                            'currentChapter': currentChapter,
+                          });
+                        }
+                        onSave(localManhwa);
+                      } else {
+                        LoadingScreen.instance().hide();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Failed to delete progress"),
+                            ),
+                          );
+                        }
+                      }
                     },
-                  );
-
-                  if (confirmed != true) return; // cancel
-
-                  LoadingScreen.instance().show(
-                    context: context,
-                    text: "Deleting progress...",
-                  );
-                  final success = await deleteProgress(localManhwa.id);
-
-                  if (success) {
-                    setState(() {
-                      localManhwa = localManhwa.copyWith(
-                        readingStatus: 'not_read',
-                        currentChapter: 0,
+                    style: TextButton.styleFrom(foregroundColor: Colors.red),
+                    child: const Text("Delete"),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Cancel"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Show loading screen
+                      LoadingScreen.instance().show(
+                        context: context,
+                        text: "Updating progress...",
                       );
-                    });
-                    LoadingScreen.instance().hide();
 
-                    Navigator.pop(context, {
-                      'readingStatus': readingStatus,
-                      'currentChapter': currentChapter,
-                    });
-                    onSave(localManhwa);
-                  } else {
-                    LoadingScreen.instance().hide();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Failed to delete progress"),
-                      ),
-                    );
-                  }
-                },
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text("Delete"),
-              ),
-
-              // Spacer to push Cancel & Save to the right
-              const Spacer(),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel"),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  // Show loading screen
-                  LoadingScreen.instance().show(
-                    context: context,
-                    text: "Updating progress...",
-                  );
-
-                  // Make api call
-                  final success = await submitProgress(
-                    manhwaId: localManhwa.id,
-                    chapter: currentChapter,
-                    readingStatus: readingStatus,
-                  );
-                  // if success, update and close loading screen and popup
-                  if (success) {
-                    setState(() {
-                      localManhwa = localManhwa.copyWith(
+                      // Make api call
+                      final success = await submitProgress(
+                        manhwaId: localManhwa.id,
+                        chapter: currentChapter,
                         readingStatus: readingStatus,
-                        currentChapter: currentChapter,
                       );
-                    });
-                    LoadingScreen.instance().hide();
-                    Navigator.pop(context, {
-                      'readingStatus': readingStatus,
-                      'currentChapter': currentChapter,
-                    });
-                    onSave(localManhwa);
-                  } else {
-                    LoadingScreen.instance().hide();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Failed to update progress"),
-                      ),
-                    );
-                  }
-                },
-                child: const Text("Save"),
+                      // if success, update and close loading screen and popup
+                      if (success) {
+                        setState(() {
+                          localManhwa = localManhwa.copyWith(
+                            readingStatus: readingStatus,
+                            currentChapter: currentChapter,
+                          );
+                        });
+                        LoadingScreen.instance().hide();
+                        if (context.mounted) {
+                          Navigator.pop(context, {
+                            'readingStatus': readingStatus,
+                            'currentChapter': currentChapter,
+                          });
+                        }
+                        onSave(localManhwa);
+                      } else {
+                        LoadingScreen.instance().hide();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Failed to update progress"),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text("Save"),
+                  ),
+                ],
               ),
             ],
           );
