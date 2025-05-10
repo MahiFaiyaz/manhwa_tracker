@@ -93,7 +93,7 @@ class LibraryViewState extends State<LibraryView> {
     setState(() {
       isLoading = true;
     });
-    LoadingScreen.instance().show(context: context, text: 'Loading library...');
+    LoadingScreen.instance().show(context: context, text: 'Loading Library...');
     try {
       final result = await fetchUserProgress();
       result.sort(

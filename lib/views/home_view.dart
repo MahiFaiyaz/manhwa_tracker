@@ -34,10 +34,7 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      LoadingScreen.instance().show(
-        context: context,
-        text: "Loading filters...",
-      );
+      LoadingScreen.instance().show(context: context, text: "Loading Data...");
       _loadAllDropdownData();
     });
   }
