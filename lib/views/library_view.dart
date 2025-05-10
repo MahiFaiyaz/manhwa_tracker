@@ -67,8 +67,14 @@ class LibraryViewState extends State<LibraryView> {
     final loggedIn = await isUserLoggedIn();
     setState(() => _isLoggedIn = loggedIn);
     if (loggedIn) {
-      await _fetchLibrary();
-      await _loadUserEmail();
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        LoadingScreen.instance().show(
+          context: context,
+          text: "Loading Library...",
+        );
+        await _loadUserEmail();
+        await _fetchLibrary();
+      });
     }
   }
 

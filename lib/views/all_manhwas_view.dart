@@ -4,7 +4,7 @@ import '../models/manhwa_filter.dart';
 import '../services/api_services.dart';
 import '../widgets/manhwa_card.dart';
 import 'dart:async';
-import '../widgets/shimmer_card.dart';
+import 'package:manhwa_tracker/dialog/loading_screen.dart';
 
 class AllManhwasView extends StatefulWidget {
   const AllManhwasView({super.key});
@@ -19,7 +19,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
   DateTime? lastRefreshed;
   Timer? cooldownTimer;
   int cooldownSecondsRemaining = 0;
-  static const int cooldownDuration = 30; // 5 mins
+  static const int cooldownDuration = 1; // 5 mins
   final TextEditingController _searchController = TextEditingController();
   List<Manhwa> filteredManhwas = [];
 
@@ -32,7 +32,13 @@ class _AllManhwasViewState extends State<AllManhwasView> {
   @override
   void initState() {
     super.initState();
-    _fetchAll();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      LoadingScreen.instance().show(
+        context: context,
+        text: "Loading Manhwas...",
+      );
+      await _fetchAll();
+    });
   }
 
   Future<void> _fetchAll() async {
@@ -41,31 +47,37 @@ class _AllManhwasViewState extends State<AllManhwasView> {
       lastRefreshed = DateTime.now();
       cooldownSecondsRemaining = cooldownDuration;
     });
+    try {
+      final result = await fetchManhwas(
+        filter: ManhwaFilter(),
+        onFallback: _showSnackBar,
+      );
 
-    final result = await fetchManhwas(
-      filter: ManhwaFilter(),
-      onFallback: _showSnackBar,
-    );
+      setState(() {
+        allManhwas = result;
+        filteredManhwas = allManhwas;
+        isLoading = false;
+      });
 
-    setState(() {
-      allManhwas = result;
-      filteredManhwas = allManhwas;
-      isLoading = false;
-    });
-
-    cooldownTimer?.cancel(); // cancel any existing one
-    cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (cooldownSecondsRemaining <= 1) {
-        timer.cancel();
-        setState(() {
-          cooldownSecondsRemaining = 0;
-        });
-      } else {
-        setState(() {
-          cooldownSecondsRemaining--;
-        });
-      }
-    });
+      cooldownTimer?.cancel(); // cancel any existing one
+      cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (cooldownSecondsRemaining <= 1) {
+          timer.cancel();
+          setState(() {
+            cooldownSecondsRemaining = 0;
+          });
+        } else {
+          setState(() {
+            cooldownSecondsRemaining--;
+          });
+        }
+      });
+    } catch (e) {
+      _showSnackBar("Failed to load manhwas.");
+      setState(() => isLoading = false);
+    } finally {
+      LoadingScreen.instance().hide();
+    }
   }
 
   String formatDuration(int totalSeconds) {
@@ -111,7 +123,15 @@ class _AllManhwasViewState extends State<AllManhwasView> {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               ),
-              onPressed: canRefresh ? _fetchAll : null,
+              onPressed: () {
+                if (canRefresh) {
+                  LoadingScreen.instance().show(
+                    context: context,
+                    text: "Loading Manhwas...",
+                  );
+                  _fetchAll();
+                }
+              },
               child: Row(
                 children: [
                   const Icon(Icons.refresh),
@@ -151,33 +171,19 @@ class _AllManhwasViewState extends State<AllManhwasView> {
               ),
             ),
             Expanded(
-              child:
-                  isLoading
-                      ? GridView.builder(
-                        itemCount: 18,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 2 / 3,
-                            ),
-                        itemBuilder: (context, index) => buildShimmerCard(),
-                      )
-                      : GridView.builder(
-                        itemCount: filteredManhwas.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 2 / 3,
-                            ),
-                        itemBuilder: (context, index) {
-                          final manhwa = filteredManhwas[index];
-                          return ManhwaCard(manhwa: manhwa);
-                        },
-                      ),
+              child: GridView.builder(
+                itemCount: filteredManhwas.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 2 / 3,
+                ),
+                itemBuilder: (context, index) {
+                  final manhwa = filteredManhwas[index];
+                  return ManhwaCard(manhwa: manhwa);
+                },
+              ),
             ),
           ],
         ),
