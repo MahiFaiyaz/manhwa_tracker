@@ -12,8 +12,18 @@ class RootView extends StatefulWidget {
 
 class _RootViewState extends State<RootView> {
   int _currentIndex = 1; // 0: Library, 1: Home, 2: All Manhwas
+  final GlobalKey<LibraryViewState> _libraryKey = GlobalKey<LibraryViewState>();
+  late final List<Widget> _pages;
 
-  final List<Widget> _pages = [LibraryView(), HomeView(), AllManhwasView()];
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      LibraryView(key: _libraryKey),
+      const HomeView(),
+      const AllManhwasView(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +33,13 @@ class _RootViewState extends State<RootView> {
         minimum: const EdgeInsets.only(bottom: 12),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: (index) {
+            if (index == 0 && _currentIndex != 0) {
+              // Refresh the library view when navigating to it
+              _libraryKey.currentState?.refreshLibrary();
+            }
+            setState(() => _currentIndex = index);
+          },
           backgroundColor: Colors.black,
           selectedItemColor: Colors.deepPurple.shade300,
           unselectedItemColor: Colors.grey.shade500,
