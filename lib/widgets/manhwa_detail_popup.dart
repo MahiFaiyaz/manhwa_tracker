@@ -188,7 +188,6 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                     text: "Deleting progress...",
                   );
                   final success = await deleteProgress(localManhwa.id);
-                  print(success);
 
                   if (success) {
                     setState(() {
@@ -197,20 +196,14 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                         currentChapter: 0,
                       );
                     });
-
-                    print("Deleted progress successfully");
                     LoadingScreen.instance().hide();
-                    print(context);
 
-                    // 2. Then close the dialog
                     Navigator.pop(context, {
                       'readingStatus': readingStatus,
                       'currentChapter': currentChapter,
                     });
-                    // closes the bottom sheet
                     onSave(localManhwa);
                   } else {
-                    print("Failed to delete progress");
                     LoadingScreen.instance().hide();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -231,17 +224,19 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  // 1. Update UI first
+                  // Show loading screen
                   LoadingScreen.instance().show(
                     context: context,
                     text: "Updating progress...",
                   );
 
+                  // Make api call
                   final success = await submitProgress(
                     manhwaId: localManhwa.id,
                     chapter: currentChapter,
                     readingStatus: readingStatus,
                   );
+                  // if success, update and close loading screen and popup
                   if (success) {
                     setState(() {
                       localManhwa = localManhwa.copyWith(
