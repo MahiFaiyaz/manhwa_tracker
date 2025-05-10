@@ -4,6 +4,7 @@ import '../services/api_services.dart';
 import '../widgets/multi_select_dropdown.dart';
 import '../models/models.dart';
 import '../models/manhwa_filter.dart';
+import '../dialog/loading_screen.dart';
 
 const stackSpace = SizedBox(height: 14);
 
@@ -32,7 +33,13 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _loadAllDropdownData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LoadingScreen.instance().show(
+        context: context,
+        text: "Loading filters...",
+      );
+      _loadAllDropdownData();
+    });
   }
 
   Future<void> _loadAllDropdownData() async {
@@ -61,6 +68,10 @@ class _HomeViewState extends State<HomeView> {
     } catch (e) {
       _showSnackBar("Failed to load filter data.");
       setState(() => isLoading = false);
+    } finally {
+      if (mounted) {
+        LoadingScreen.instance().hide();
+      }
     }
   }
 
@@ -116,13 +127,6 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Manhwa Finder')),
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(title: const Text('Manhwa Finder')),
       body: SingleChildScrollView(
