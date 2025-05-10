@@ -24,10 +24,6 @@ class _LibraryViewState extends State<LibraryView> {
   final ScrollController _scrollController = ScrollController();
   Map<String, GlobalKey> sectionKeys = {};
   String selectedStatus = 'to_read';
-  int cooldownSecondsRemaining = 0;
-  DateTime? lastRefreshed;
-  Timer? cooldownTimer;
-  static const int cooldownDuration = 5; // 5 mins
   String _searchQuery = '';
   final ScrollController _chipScrollController = ScrollController();
   final Map<String, GlobalKey> chipKeys = {};
@@ -86,8 +82,6 @@ class _LibraryViewState extends State<LibraryView> {
   Future<void> _fetchLibrary() async {
     setState(() {
       isLoading = true;
-      lastRefreshed = DateTime.now();
-      cooldownSecondsRemaining = cooldownDuration;
     });
     try {
       final result = await fetchUserProgress();
@@ -111,19 +105,7 @@ class _LibraryViewState extends State<LibraryView> {
         isLoading = false;
         selectedStatus = firstNonEmpty.key;
       });
-      cooldownTimer?.cancel(); // cancel any existing one
-      cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (cooldownSecondsRemaining <= 1) {
-          timer.cancel();
-          setState(() {
-            cooldownSecondsRemaining = 0;
-          });
-        } else {
-          setState(() {
-            cooldownSecondsRemaining--;
-          });
-        }
-      });
+
       // Jump to that section after the widgets build
       Future.delayed(const Duration(milliseconds: 100), () {
         _jumpToStatus(selectedStatus);
@@ -236,7 +218,6 @@ class _LibraryViewState extends State<LibraryView> {
     });
   }
 
-  bool get canRefresh => cooldownSecondsRemaining == 0;
   String formatDuration(int totalSeconds) {
     final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
     final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
@@ -281,16 +262,12 @@ class _LibraryViewState extends State<LibraryView> {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               ),
-              onPressed: canRefresh ? _fetchLibrary : null,
+              onPressed: isLoading ? null : _fetchLibrary,
               child: Row(
                 children: [
                   const Icon(Icons.refresh),
                   const SizedBox(width: 8),
-                  Text(
-                    canRefresh
-                        ? "Refresh"
-                        : formatDuration(cooldownSecondsRemaining),
-                  ),
+                  Text("Refresh"),
                 ],
               ),
             ),
