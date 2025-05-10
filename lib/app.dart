@@ -64,6 +64,20 @@ class MyApp extends StatelessWidget {
                   inactiveTrackColor: Colors.grey.shade300,
                   thumbColor: Colors.deepPurple.shade200,
                 ),
+                popupMenuTheme: PopupMenuThemeData(
+                  color: Colors.deepPurple.shade300,
+                  textStyle: TextStyle(
+                    color: Colors.grey.shade200,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      8,
+                    ), // match button shape
+                  ),
+                  elevation: 8, // same as ElevatedButton
+                ),
               ),
 
               home: const RootView(),

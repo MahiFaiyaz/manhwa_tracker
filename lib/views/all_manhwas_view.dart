@@ -19,7 +19,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
   DateTime? lastRefreshed;
   Timer? cooldownTimer;
   int cooldownSecondsRemaining = 0;
-  static const int cooldownDuration = 300; // 5 mins
+  static const int cooldownDuration = 30; // 5 mins
   final TextEditingController _searchController = TextEditingController();
   List<Manhwa> filteredManhwas = [];
 
@@ -48,7 +48,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
     );
 
     setState(() {
-      allManhwas = result.manhwas;
+      allManhwas = result;
       filteredManhwas = allManhwas;
       isLoading = false;
     });
@@ -102,6 +102,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: const Text('All Manhwas'),
         actions: [
           Padding(
