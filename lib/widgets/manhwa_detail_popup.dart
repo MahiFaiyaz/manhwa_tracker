@@ -255,6 +255,13 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                       'currentChapter': currentChapter,
                     });
                     onSave(localManhwa);
+                  } else {
+                    LoadingScreen.instance().hide();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Failed to update progress"),
+                      ),
+                    );
                   }
                 },
                 child: const Text("Save"),
