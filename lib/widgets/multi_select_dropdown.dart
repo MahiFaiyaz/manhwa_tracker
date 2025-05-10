@@ -17,10 +17,10 @@ class MultiSelectDropdown extends StatelessWidget {
     required this.matchAll,
   });
 
-  void _showSelectionModal(BuildContext context) {
+  Future<void> _showSelectionModal(BuildContext context) async {
     List<String> tempSelected = [...selectedItems];
 
-    showModalBottomSheet(
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
@@ -32,11 +32,9 @@ class MultiSelectDropdown extends StatelessWidget {
           matchAll: matchAll,
         );
       },
-    ).then((_) {
-      onSelectionChanged(
-        tempSelected,
-      ); // Always return whatever was last selected
-    });
+    );
+
+    onSelectionChanged(tempSelected);
   }
 
   @override
