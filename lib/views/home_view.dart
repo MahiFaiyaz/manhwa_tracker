@@ -143,6 +143,7 @@ class _HomeViewState extends State<HomeView> {
               onSelectionChanged: (values) {
                 setState(() => selectedGenres = values);
               },
+              matchAll: true,
             ),
             const SizedBox(height: 24),
 
@@ -153,6 +154,7 @@ class _HomeViewState extends State<HomeView> {
               onSelectionChanged: (values) {
                 setState(() => selectedCategories = values);
               },
+              matchAll: true,
             ),
             const SizedBox(height: 24),
 
@@ -163,6 +165,7 @@ class _HomeViewState extends State<HomeView> {
               onSelectionChanged: (values) {
                 setState(() => selectedRatings = values);
               },
+              matchAll: false,
             ),
             const SizedBox(height: 24),
 
@@ -173,6 +176,7 @@ class _HomeViewState extends State<HomeView> {
               onSelectionChanged: (values) {
                 setState(() => selectedStatus = values);
               },
+              matchAll: false,
             ),
             const SizedBox(height: 24),
             Column(

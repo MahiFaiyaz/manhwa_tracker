@@ -6,6 +6,7 @@ class MultiSelectDropdown extends StatelessWidget {
   final List<String> items;
   final List<String> selectedItems;
   final void Function(List<String>) onSelectionChanged;
+  final bool matchAll;
 
   const MultiSelectDropdown({
     super.key,
@@ -13,6 +14,7 @@ class MultiSelectDropdown extends StatelessWidget {
     required this.items,
     required this.selectedItems,
     required this.onSelectionChanged,
+    required this.matchAll,
   });
 
   void _showSelectionModal(BuildContext context) {
@@ -27,6 +29,7 @@ class MultiSelectDropdown extends StatelessWidget {
           label: label,
           items: items,
           tempSelected: tempSelected,
+          matchAll: matchAll,
         );
       },
     ).then((_) {
@@ -85,11 +88,13 @@ class _MultiSelectModalContent extends StatefulWidget {
   final String label;
   final List<String> items;
   final List<String> tempSelected;
+  final bool matchAll;
 
   const _MultiSelectModalContent({
     required this.label,
     required this.items,
     required this.tempSelected,
+    required this.matchAll,
   });
 
   @override
@@ -111,7 +116,9 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Select ${widget.label}",
+                  widget.matchAll
+                      ? "Match ALL selected ${widget.label.toLowerCase()}"
+                      : "Match ANY selected ${widget.label.toLowerCase()}",
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
