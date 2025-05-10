@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manhwa_tracker/dialog/loading_screen.dart';
 import '../services/auth_services.dart';
 import 'login_signup_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,10 +13,10 @@ class LibraryView extends StatefulWidget {
   const LibraryView({super.key});
 
   @override
-  State<LibraryView> createState() => _LibraryViewState();
+  State<LibraryView> createState() => LibraryViewState();
 }
 
-class _LibraryViewState extends State<LibraryView> {
+class LibraryViewState extends State<LibraryView> {
   bool? _isLoggedIn;
   String? userEmail;
   bool isLoading = true;
@@ -77,6 +78,10 @@ class _LibraryViewState extends State<LibraryView> {
     setState(() {
       userEmail = prefs.getString('user_email');
     });
+  }
+
+  void refreshLibrary() {
+    _fetchLibrary();
   }
 
   Future<void> _fetchLibrary() async {
@@ -282,12 +287,24 @@ class _LibraryViewState extends State<LibraryView> {
               color: Colors.deepPurple.shade300,
               size: 40,
             ),
-            onSelected: (value) {
+            onSelected: (value) async {
               if (value == 'logout') {
-                logoutUser().then((_) {
+                LoadingScreen.instance().show(
+                  context: context,
+                  text: 'Logging out...',
+                );
+                await logoutUser();
+                LoadingScreen.instance().hide();
+                if (mounted) {
                   setState(() => _isLoggedIn = false);
-                });
+                  _showSnackBar("Logged out successfully.");
+                }
               }
+              // } else if (value == 'auth_token') {
+              //   print('Token: ${await getAuthToken()}');
+              // } else if (value == 'refresh_token') {
+              //   print('refresh token: ${await getRefreshToken()}');
+              // }
             },
             itemBuilder:
                 (context) => [
@@ -310,6 +327,16 @@ class _LibraryViewState extends State<LibraryView> {
                     height: 16,
                     child: Text('Log Out'),
                   ),
+                  // const PopupMenuItem(
+                  //   value: 'auth_token',
+                  //   height: 16,
+                  //   child: Text('Get auth'),
+                  // ),
+                  // const PopupMenuItem(
+                  //   value: 'refresh_token',
+                  //   height: 16,
+                  //   child: Text('get refresh'),
+                  // ),
                 ],
           ),
         ),
@@ -417,8 +444,25 @@ class _LibraryViewState extends State<LibraryView> {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children:
-                            manhwasByStatus.entries.map((entry) {
+                        children: [
+                          if (manhwasByStatus.values.every(
+                            (list) => list.isEmpty,
+                          ))
+                            const Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 32),
+                                child: Text(
+                                  "Library is empty. Start tracking!",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 32,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            )
+                          else
+                            ...manhwasByStatus.entries.map((entry) {
                               final status = entry.key;
                               final key = GlobalKey();
                               final items =
@@ -472,6 +516,7 @@ class _LibraryViewState extends State<LibraryView> {
                                 ],
                               );
                             }).toList(),
+                        ],
                       ),
                     ),
                   ),
