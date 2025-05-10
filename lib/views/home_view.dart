@@ -79,12 +79,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void _showResults() async {
-    showDialog(
-      // optional loading indicator
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
-    );
+    LoadingScreen.instance().show(context: context, text: "Finding Manhwas...");
 
     try {
       final result = await fetchManhwas(
@@ -102,8 +97,6 @@ class _HomeViewState extends State<HomeView> {
 
       if (!mounted) return;
 
-      Navigator.pop(context); // remove loading spinner
-
       if (result.isEmpty) {
         _showSnackBar("No results found.");
         return;
@@ -117,8 +110,9 @@ class _HomeViewState extends State<HomeView> {
       );
     } catch (e) {
       if (!mounted) return;
-      Navigator.pop(context); // remove loading spinner
       _showSnackBar("Failed to load results: $e");
+    } finally {
+      LoadingScreen.instance().hide();
     }
   }
 
