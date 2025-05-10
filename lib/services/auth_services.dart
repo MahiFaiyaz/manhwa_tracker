@@ -38,7 +38,18 @@ Future<bool> loginUser({
       await prefs.setString('user_email', email);
       return true;
     } else {
-      final err = 'Login failed: ${response.statusCode}';
+      // Try extracting error message from response body
+      String err = 'Login failed: ${response.statusCode}';
+
+      try {
+        final errorBody = json.decode(response.body);
+        if (errorBody is Map && errorBody.containsKey('error')) {
+          err = errorBody['message'];
+        }
+      } catch (_) {
+        // fallback to default error message
+      }
+
       debugPrint(err);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         onError?.call(err);
