@@ -16,6 +16,13 @@ class _LoginSignupViewState extends State<LoginSignupView> {
   bool isLogin = true;
   String? message;
 
+  void _showSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> submit() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -38,7 +45,11 @@ class _LoginSignupViewState extends State<LoginSignupView> {
 
     if (success && mounted) {
       setState(() => message = "Success!");
-      widget.onLoginSuccess?.call(); // delegate navigation
+      if (isLogin) {
+        widget.onLoginSuccess?.call(); // delegate navigation
+      } else {
+        _showSnackBar("Please verify email.");
+      }
     }
   }
 
