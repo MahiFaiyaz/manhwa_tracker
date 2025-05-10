@@ -5,6 +5,8 @@ import '../widgets/multi_select_dropdown.dart';
 import '../models/models.dart';
 import '../models/manhwa_filter.dart';
 
+const stackSpace = SizedBox(height: 14);
+
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -131,7 +133,7 @@ class _HomeViewState extends State<HomeView> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Manhwa Finder')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -145,7 +147,7 @@ class _HomeViewState extends State<HomeView> {
               },
               matchAll: true,
             ),
-            const SizedBox(height: 24),
+            stackSpace,
 
             MultiSelectDropdown(
               label: 'Categories',
@@ -156,7 +158,7 @@ class _HomeViewState extends State<HomeView> {
               },
               matchAll: true,
             ),
-            const SizedBox(height: 24),
+            stackSpace,
 
             MultiSelectDropdown(
               label: 'Ratings',
@@ -167,7 +169,7 @@ class _HomeViewState extends State<HomeView> {
               },
               matchAll: false,
             ),
-            const SizedBox(height: 24),
+            stackSpace,
 
             MultiSelectDropdown(
               label: 'Status',
@@ -178,7 +180,7 @@ class _HomeViewState extends State<HomeView> {
               },
               matchAll: false,
             ),
-            const SizedBox(height: 24),
+            stackSpace,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -198,7 +200,7 @@ class _HomeViewState extends State<HomeView> {
                 Text('Only show manhwas with $minChapters+ chapters'),
               ],
             ),
-            const SizedBox(height: 24),
+            stackSpace,
 
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +223,7 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
 
-            const SizedBox(height: 24),
+            stackSpace,
 
             ElevatedButton(
               onPressed: _showResults,
