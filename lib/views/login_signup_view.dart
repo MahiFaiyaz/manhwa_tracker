@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_services.dart';
+import '../dialog/loading_screen.dart';
 
 class LoginSignupView extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -30,6 +31,11 @@ class _LoginSignupViewState extends State<LoginSignupView> {
       setState(() => message = msg);
     }
 
+    LoadingScreen.instance().show(
+      context: context,
+      text: isLogin ? 'Logging in...' : 'Signing up...',
+    );
+
     final success =
         isLogin
             ? await loginUser(
@@ -42,6 +48,8 @@ class _LoginSignupViewState extends State<LoginSignupView> {
               password: password,
               onError: onError,
             );
+
+    LoadingScreen.instance().hide();
 
     if (success && mounted) {
       setState(() => message = "Success!");
