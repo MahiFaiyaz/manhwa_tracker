@@ -230,35 +230,32 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                 child: const Text("Cancel"),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // 1. Update UI first
-                  setState(() {
-                    localManhwa = localManhwa.copyWith(
-                      readingStatus: readingStatus,
-                      currentChapter: currentChapter,
-                    );
-                  });
+                  LoadingScreen.instance().show(
+                    context: context,
+                    text: "Updating progress...",
+                  );
 
-                  // 2. Then close the dialog
-                  Navigator.pop(context, {
-                    'readingStatus': readingStatus,
-                    'currentChapter': currentChapter,
-                  });
-                  onSave(localManhwa);
-                  // 3. Run the API call in the background
-                  submitProgress(
+                  final success = await submitProgress(
                     manhwaId: localManhwa.id,
                     chapter: currentChapter,
                     readingStatus: readingStatus,
-                  ).then((success) {
-                    if (!success && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Failed to update progress"),
-                        ),
+                  );
+                  if (success) {
+                    setState(() {
+                      localManhwa = localManhwa.copyWith(
+                        readingStatus: readingStatus,
+                        currentChapter: currentChapter,
                       );
-                    }
-                  });
+                    });
+                    LoadingScreen.instance().hide();
+                    Navigator.pop(context, {
+                      'readingStatus': readingStatus,
+                      'currentChapter': currentChapter,
+                    });
+                    onSave(localManhwa);
+                  }
                 },
                 child: const Text("Save"),
               ),
