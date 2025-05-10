@@ -120,11 +120,15 @@ Future<String?> getAuthToken() async {
   return prefs.getString('auth_token');
 }
 
-Future<void> refreshAuthToken({void Function(String)? onError}) async {
+Future<String?> getRefreshToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('refresh_token');
+}
+
+Future<bool> refreshAuthToken({void Function(String)? onError}) async {
   try {
-    final prefs = await SharedPreferences.getInstance();
-    final refreshToken = prefs.getString('refresh_token');
-    if (refreshToken == null) return;
+    final refreshToken = await getRefreshToken();
+    if (refreshToken == null) return false;
 
     final response = await http.post(
       Uri.parse('$apiBaseUrl/refresh_token'),
@@ -136,38 +140,57 @@ Future<void> refreshAuthToken({void Function(String)? onError}) async {
       final data = json.decode(response.body);
 
       final authToken = data['access_token'];
-      final newRefreshToken = data['refresh_token'];
+      final newRefreshToken = data['refresh_token'] ?? refreshToken;
 
-      if (authToken == null || newRefreshToken == null) {
+      if (authToken == null) {
         debugPrint(
-          "Missing token(s): access_token=$authToken, refresh_token=$newRefreshToken",
+          "Missing access_token after refresh. refresh_token=${data['refresh_token']}",
         );
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          onError?.call(
-            "Token refresh succeeded but access/refresh token missing.",
-          );
+          onError?.call("Token refresh succeeded but access token missing.");
         });
-        return;
+        return false;
       }
-
+      final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', authToken);
       await prefs.setString('refresh_token', newRefreshToken);
+      return true;
     } else {
       final err = 'Refresh token failed: ${response.statusCode}';
       debugPrint(err);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         onError?.call(err);
       });
+      return false;
     }
   } catch (e) {
     debugPrint("Refresh error: $e");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       onError?.call("An error occurred while refreshing token.");
     });
+    return false;
   }
 }
 
 Future<bool> isUserLoggedIn() async {
   final token = await getAuthToken();
-  return token != null && token.isNotEmpty;
+
+  if (token != null && token.isNotEmpty) {
+    // Try making a lightweight API call or refresh the token silently
+    final refreshed = await refreshAuthToken(
+      onError: (_) {}, // optional, you can suppress error here
+    );
+
+    if (refreshed) {
+      return true;
+    } else {
+      // Clear invalid session
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('auth_token');
+      await prefs.remove('refresh_token');
+      await prefs.remove('user_email');
+    }
+  }
+
+  return false;
 }
