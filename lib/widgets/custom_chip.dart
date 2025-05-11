@@ -12,7 +12,7 @@ Widget customChip(
 
   Widget? iconWidget;
   if (icon != null) {
-    iconWidget = Icon(icon, size: 16);
+    iconWidget = Icon(icon, size: 16, color: textColor);
   }
 
   return Chip(

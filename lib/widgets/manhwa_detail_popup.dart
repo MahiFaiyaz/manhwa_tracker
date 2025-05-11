@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import '../services/api_services.dart';
 import '../dialog/loading_screen.dart';
+import '../services/auth_services.dart';
 
 class ManhwaDetailPopup extends StatefulWidget {
   final Manhwa manhwa;
@@ -17,10 +18,16 @@ class ManhwaDetailPopup extends StatefulWidget {
 
 class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
   late Manhwa localManhwa;
+  bool loggedIn = false;
   @override
   void initState() {
     super.initState();
     localManhwa = widget.manhwa;
+    _init();
+  }
+
+  void _init() async {
+    loggedIn = await isUserLoggedIn();
   }
 
   double _mapRatingToStars(String? rating) {
@@ -66,6 +73,10 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
     };
 
     String readingLabel(Manhwa manhwa) {
+      if (manhwa.readingStatus == 'not_read') {
+        return "Add to Library";
+      }
+
       final label = readingStatusLabels[manhwa.readingStatus] ?? "Not Read";
 
       final showChapter = [
@@ -347,15 +358,17 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                         ),
                       ),
                     ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            final result =
-                                await showGeneralDialog<Map<String, dynamic>>(
+                    loggedIn
+                        ? Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () async {
+                                final result = await showGeneralDialog<
+                                  Map<String, dynamic>
+                                >(
                                   context: context,
                                   barrierDismissible: true,
                                   barrierLabel: "Progress Update",
@@ -380,27 +393,30 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                                   },
                                 );
 
-                            // After the dialog is closed
-                            if (result != null && mounted) {
-                              setState(() {
-                                localManhwa = localManhwa.copyWith(
-                                  readingStatus:
-                                      result['readingStatus'] as String,
-                                  currentChapter:
-                                      result['currentChapter'] as int,
-                                );
-                              });
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(8),
-                          child: customChip(
-                            readingLabel(localManhwa),
-                            icon: Icons.edit,
-                            shimmer: true,
+                                // After the dialog is closed
+                                if (result != null && mounted) {
+                                  setState(() {
+                                    localManhwa = localManhwa.copyWith(
+                                      readingStatus:
+                                          result['readingStatus'] as String,
+                                      currentChapter:
+                                          result['currentChapter'] as int,
+                                    );
+                                  });
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: customChip(
+                                readingLabel(localManhwa),
+                                icon:
+                                    localManhwa.readingStatus == 'not_read'
+                                        ? Icons.add
+                                        : Icons.edit,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
+                        )
+                        : const SizedBox.shrink(),
                     Positioned(
                       left: 0,
                       top: 0,
