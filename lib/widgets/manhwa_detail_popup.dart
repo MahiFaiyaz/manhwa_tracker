@@ -392,7 +392,6 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
                                     );
                                   },
                                 );
-
                                 // After the dialog is closed
                                 if (result != null && mounted) {
                                   setState(() {
