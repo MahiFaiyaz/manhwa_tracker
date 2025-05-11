@@ -20,11 +20,53 @@ class _ManhwaCardState extends State<ManhwaCard> {
     localManhwa = widget.manhwa;
   }
 
+  Widget _buildRatingBadge(String rating) {
+    final stars = _getStarCountFromRating(rating);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.shade300,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Text(
+            "$stars",
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Icon(Icons.star, color: Colors.black, size: 16),
+        ],
+      ),
+    );
+  }
+
+  int _getStarCountFromRating(String rating) {
+    switch (rating) {
+      case 'Highly Recommended':
+        return 5;
+      case 'Recommended':
+        return 4;
+      case 'Good':
+        return 3;
+      case 'Decent':
+        return 2;
+      case 'Meh':
+        return 1;
+      default:
+        return 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = localManhwa.name;
     final imageUrl = localManhwa.imageUrl;
-    // final rating = localManhwa.rating;
+    final rating = localManhwa.rating;
     // final status = localManhwa.status;
 
     return GestureDetector(
@@ -63,6 +105,9 @@ class _ManhwaCardState extends State<ManhwaCard> {
                     ),
               ),
             ),
+            // ⭐️ Rating Badge
+            Positioned(top: 0, left: 0, child: _buildRatingBadge(rating)),
+
             Positioned(
               left: 0,
               right: 0,
