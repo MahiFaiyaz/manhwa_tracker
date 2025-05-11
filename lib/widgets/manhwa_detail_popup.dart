@@ -19,15 +19,23 @@ class ManhwaDetailPopup extends StatefulWidget {
 class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
   late Manhwa localManhwa;
   bool loggedIn = false;
+  bool isInitialized = false;
+
   @override
   void initState() {
     super.initState();
-    localManhwa = widget.manhwa;
     _init();
   }
 
-  void _init() async {
-    loggedIn = await isUserLoggedIn();
+  Future<void> _init() async {
+    final userLoggedIn = await isUserLoggedIn();
+    if (!mounted) return;
+
+    setState(() {
+      loggedIn = userLoggedIn;
+      localManhwa = widget.manhwa;
+      isInitialized = true;
+    });
   }
 
   double _mapRatingToStars(String? rating) {
@@ -49,6 +57,13 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
 
   @override
   Widget build(BuildContext context) {
+    if (!isInitialized) {
+      return SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.8,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final title = localManhwa.name;
     final imageUrl = localManhwa.imageUrl.replaceFirst('.webp', 'l.webp');
     final synopsis = localManhwa.synopsis;
@@ -288,7 +303,7 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
     }
 
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.9,
+      height: MediaQuery.sizeOf(context).height * 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Scrollbar(

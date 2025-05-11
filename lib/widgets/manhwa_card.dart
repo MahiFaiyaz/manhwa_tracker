@@ -62,6 +62,19 @@ class _ManhwaCardState extends State<ManhwaCard> {
     }
   }
 
+  Widget _buildLibraryBadge(String readingStatus) {
+    if (readingStatus == 'not_read') return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.shade300,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(Icons.bookmark_added, color: Colors.black, size: 16),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = localManhwa.name;
@@ -105,8 +118,12 @@ class _ManhwaCardState extends State<ManhwaCard> {
                     ),
               ),
             ),
-            // ⭐️ Rating Badge
             Positioned(top: 0, left: 0, child: _buildRatingBadge(rating)),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: _buildLibraryBadge(localManhwa.readingStatus),
+            ),
 
             Positioned(
               left: 0,

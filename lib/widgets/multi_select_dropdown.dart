@@ -104,7 +104,7 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.7,
+      height: MediaQuery.sizeOf(context).height * 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -135,7 +135,6 @@ class _MultiSelectModalContentState extends State<_MultiSelectModalContent> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: widget.items.length,
