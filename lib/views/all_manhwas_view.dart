@@ -19,13 +19,13 @@ class _AllManhwasViewState extends State<AllManhwasView> {
   DateTime? lastRefreshed;
   Timer? cooldownTimer;
   int cooldownSecondsRemaining = 0;
-  static const int cooldownDuration = 1; // 5 mins
+  static const int cooldownDuration = 1;
   final TextEditingController _searchController = TextEditingController();
-  List<Manhwa> filteredManhwas = [];
 
   @override
   void dispose() {
     _searchController.dispose();
+    cooldownTimer?.cancel();
     super.dispose();
   }
 
@@ -55,21 +55,16 @@ class _AllManhwasViewState extends State<AllManhwasView> {
 
       setState(() {
         allManhwas = result;
-        filteredManhwas = allManhwas;
         isLoading = false;
       });
 
-      cooldownTimer?.cancel(); // cancel any existing one
+      cooldownTimer?.cancel();
       cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (cooldownSecondsRemaining <= 1) {
           timer.cancel();
-          setState(() {
-            cooldownSecondsRemaining = 0;
-          });
+          setState(() => cooldownSecondsRemaining = 0);
         } else {
-          setState(() {
-            cooldownSecondsRemaining--;
-          });
+          setState(() => cooldownSecondsRemaining--);
         }
       });
     } catch (e) {
@@ -80,11 +75,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
     }
   }
 
-  String formatDuration(int totalSeconds) {
-    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
-    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
-    return "$minutes:$seconds";
-  }
+  bool get canRefresh => cooldownSecondsRemaining == 0;
 
   void _showSnackBar(String message) {
     if (!mounted) return;
@@ -93,24 +84,22 @@ class _AllManhwasViewState extends State<AllManhwasView> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  bool get canRefresh => cooldownSecondsRemaining == 0;
-
-  void _search(String query) {
-    final trimmed = query.toLowerCase().trim();
-    setState(() {
-      if (trimmed.isEmpty) {
-        filteredManhwas = allManhwas;
-      } else {
-        filteredManhwas =
-            allManhwas
-                .where((m) => m.name.toLowerCase().contains(trimmed))
-                .toList();
-      }
-    });
+  String formatDuration(int totalSeconds) {
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
   }
 
   @override
   Widget build(BuildContext context) {
+    final searchQuery = _searchController.text.trim().toLowerCase();
+    final visibleManhwas =
+        searchQuery.isEmpty
+            ? allManhwas
+            : allManhwas
+                .where((m) => m.name.toLowerCase().contains(searchQuery))
+                .toList();
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -155,7 +144,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
               padding: const EdgeInsets.only(bottom: 8),
               child: TextField(
                 controller: _searchController,
-                onChanged: _search,
+                onChanged: (_) => setState(() {}), // rebuild to trigger filter
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Search titles...',
@@ -170,21 +159,32 @@ class _AllManhwasViewState extends State<AllManhwasView> {
                 ),
               ),
             ),
-            Expanded(
-              child: GridView.builder(
-                itemCount: filteredManhwas.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 2 / 3,
+            if (visibleManhwas.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(top: 32),
+                child: Text(
+                  "No results found.",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  textAlign: TextAlign.center,
                 ),
-                itemBuilder: (context, index) {
-                  final manhwa = filteredManhwas[index];
-                  return ManhwaCard(manhwa: manhwa);
-                },
+              )
+            else
+              Expanded(
+                child: GridView.builder(
+                  itemCount: visibleManhwas.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 2 / 3,
+                  ),
+                  itemBuilder: (context, index) {
+                    final manhwa = visibleManhwas[index];
+                    return ManhwaCard(key: ValueKey(manhwa.id), manhwa: manhwa);
+                    ;
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),
