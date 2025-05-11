@@ -274,6 +274,20 @@ class LibraryViewState extends State<LibraryView> {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.deepPurple.shade300,
+                side: BorderSide(
+                  color:
+                      isLoading
+                          ? Colors.transparent
+                          : Colors.deepPurple.shade300,
+                  width: 2,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+                minimumSize: const Size(0, 0),
               ),
               onPressed: isLoading ? null : _fetchLibrary,
               child: Row(

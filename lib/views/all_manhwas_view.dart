@@ -19,7 +19,7 @@ class _AllManhwasViewState extends State<AllManhwasView> {
   DateTime? lastRefreshed;
   Timer? cooldownTimer;
   int cooldownSecondsRemaining = 0;
-  static const int cooldownDuration = 1;
+  static const int cooldownDuration = 10;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -111,16 +111,31 @@ class _AllManhwasViewState extends State<AllManhwasView> {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.deepPurple.shade300,
+                side: BorderSide(
+                  color:
+                      canRefresh
+                          ? Colors.deepPurple.shade300
+                          : Colors.transparent,
+                  width: 2,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+                minimumSize: const Size(0, 0),
               ),
-              onPressed: () {
-                if (canRefresh) {
-                  LoadingScreen.instance().show(
-                    context: context,
-                    text: "Loading Manhwas...",
-                  );
-                  _fetchAll();
-                }
-              },
+              onPressed:
+                  canRefresh
+                      ? () {
+                        LoadingScreen.instance().show(
+                          context: context,
+                          text: "Loading Manhwas...",
+                        );
+                        _fetchAll();
+                      }
+                      : null,
               child: Row(
                 children: [
                   const Icon(Icons.refresh),
