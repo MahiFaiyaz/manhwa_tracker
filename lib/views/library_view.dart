@@ -502,6 +502,7 @@ class LibraryViewState extends State<LibraryView> {
                               return ManhwaCard(
                                 manhwa: items[index],
                                 onLibraryUpdate: _fetchLibrary,
+                                showLibraryBadge: false,
                               );
                             },
                           ),

@@ -5,8 +5,14 @@ import '../models/manhwa.dart';
 class ManhwaCard extends StatefulWidget {
   final Manhwa manhwa;
   final VoidCallback? onLibraryUpdate;
+  final bool showLibraryBadge;
 
-  const ManhwaCard({super.key, required this.manhwa, this.onLibraryUpdate});
+  const ManhwaCard({
+    super.key,
+    required this.manhwa,
+    this.onLibraryUpdate,
+    this.showLibraryBadge = true,
+  });
   @override
   State<ManhwaCard> createState() => _ManhwaCardState();
 }
@@ -119,12 +125,12 @@ class _ManhwaCardState extends State<ManhwaCard> {
               ),
             ),
             Positioned(top: 0, left: 0, child: _buildRatingBadge(rating)),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: _buildLibraryBadge(localManhwa.readingStatus),
-            ),
-
+            if (widget.showLibraryBadge)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: _buildLibraryBadge(localManhwa.readingStatus),
+              ),
             Positioned(
               left: 0,
               right: 0,
@@ -132,7 +138,7 @@ class _ManhwaCardState extends State<ManhwaCard> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.black54, // subtle dark overlay
+                  color: Colors.black54,
                   borderRadius: BorderRadius.vertical(
                     bottom: Radius.circular(12),
                   ),
