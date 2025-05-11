@@ -181,7 +181,6 @@ class _AllManhwasViewState extends State<AllManhwasView> {
                   itemBuilder: (context, index) {
                     final manhwa = visibleManhwas[index];
                     return ManhwaCard(key: ValueKey(manhwa.id), manhwa: manhwa);
-                    ;
                   },
                 ),
               ),
