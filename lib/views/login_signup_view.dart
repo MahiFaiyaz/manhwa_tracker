@@ -18,6 +18,12 @@ class _LoginSignupViewState extends State<LoginSignupView> {
   String? message;
   String? passwordValidationMessage;
   bool isPasswordValid = false;
+  bool isEmailValid = false;
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+    return emailRegex.hasMatch(email);
+  }
 
   String? validatePassword(String password) {
     if (password.length < 8) {
@@ -121,7 +127,23 @@ class _LoginSignupViewState extends State<LoginSignupView> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  onChanged: (value) {
+                    setState(() {
+                      isEmailValid = isValidEmail(value.trim());
+                    });
+                  },
                 ),
+                if (!isLogin &&
+                    !isEmailValid &&
+                    emailController.text.isNotEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 4),
+                    child: Text(
+                      "Please enter a valid email",
+                      style: TextStyle(fontSize: 12, color: Colors.redAccent),
+                    ),
+                  ),
+
                 const SizedBox(height: 16),
                 TextField(
                   controller: passwordController,
@@ -144,7 +166,7 @@ class _LoginSignupViewState extends State<LoginSignupView> {
                 ),
                 if (!isLogin && passwordValidationMessage != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       passwordValidationMessage!,
                       style: const TextStyle(
@@ -156,7 +178,7 @@ class _LoginSignupViewState extends State<LoginSignupView> {
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed:
-                      isLogin || isPasswordValid
+                      isLogin || (isPasswordValid && isEmailValid)
                           ? submit
                           : null, // disabled if invalid during signup
                   icon: const Icon(Icons.lock_open),
