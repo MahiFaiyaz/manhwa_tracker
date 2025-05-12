@@ -16,6 +16,24 @@ class _LoginSignupViewState extends State<LoginSignupView> {
   final passwordController = TextEditingController();
   bool isLogin = true;
   String? message;
+  String? passwordValidationMessage;
+  bool isPasswordValid = false;
+
+  String? validatePassword(String password) {
+    if (password.length < 8) {
+      return "Password must be at least 8 characters";
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      return "Must include an uppercase letter";
+    }
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      return "Must include a lowercase letter";
+    }
+    if (!RegExp(r'[0-9]').hasMatch(password)) {
+      return "Must include a number";
+    }
+    return null;
+  }
 
   void _showSnackBar(String message) {
     if (!mounted) return;
@@ -29,6 +47,14 @@ class _LoginSignupViewState extends State<LoginSignupView> {
     final password = passwordController.text.trim();
     void onError(String msg) {
       setState(() => message = msg);
+    }
+
+    if (!isLogin) {
+      final validationMessage = validatePassword(password);
+      if (validationMessage != null) {
+        setState(() => message = validationMessage);
+        return;
+      }
     }
 
     LoadingScreen.instance().show(
@@ -107,10 +133,32 @@ class _LoginSignupViewState extends State<LoginSignupView> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  onChanged: (value) {
+                    if (!isLogin) {
+                      setState(() {
+                        passwordValidationMessage = validatePassword(value);
+                        isPasswordValid = validatePassword(value) == null;
+                      });
+                    }
+                  },
                 ),
+                if (!isLogin && passwordValidationMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      passwordValidationMessage!,
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
-                  onPressed: submit,
+                  onPressed:
+                      isLogin || isPasswordValid
+                          ? submit
+                          : null, // disabled if invalid during signup
                   icon: const Icon(Icons.lock_open),
                   label: Text(isLogin ? "Log In" : "Sign Up"),
                   style: ElevatedButton.styleFrom(
