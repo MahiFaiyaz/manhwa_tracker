@@ -112,7 +112,9 @@ Future<List<Manhwa>> fetchManhwas({
   required ManhwaFilter filter,
   void Function(String)? onFallback,
 }) async {
-  Future<List<Manhwa>> makeRequest({String? token}) async {
+  try {
+    final token = session?.accessToken;
+
     final headers = {
       'Content-Type': 'application/json',
       if (token != null) 'auth-token': 'Bearer $token',
@@ -125,41 +127,17 @@ Future<List<Manhwa>> fetchManhwas({
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      final manhwas = data.map((json) => Manhwa.fromJson(json)).toList();
-      return manhwas;
+      return data.map((json) => Manhwa.fromJson(json)).toList();
+    } else {
+      throw Exception('Bad status code: ${response.statusCode}');
     }
-    throw Exception('Bad status code: ${response.statusCode}');
-  }
-
-  try {
-    // 1. Try with current token
-    String? token = await getAuthToken();
-    if (token != null) {
-      try {
-        return await makeRequest(token: token);
-      } catch (_) {
-        // 2. Refresh token and retry
-        await refreshAuthToken();
-        token = await getAuthToken();
-        if (token != null) {
-          try {
-            return await makeRequest(token: token);
-          } catch (_) {
-            // fall through to unauthenticated
-          }
-        }
-      }
-    }
-    return await makeRequest(token: null);
   } catch (e) {
     debugPrint("Manhwa fetch failed: $e");
-
     if (onFallback != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         onFallback.call("Failed to load manhwas. Please try again later.");
       });
     }
-
     return [];
   }
 }
@@ -168,31 +146,17 @@ Future<List<Manhwa>> fetchUserProgress({
   void Function(String)? onFallback,
 }) async {
   try {
-    String? token = await getAuthToken();
+    final token = session?.accessToken;
     if (token == null) throw Exception("Missing auth token");
 
-    Future<http.Response> makeRequest(String token) {
-      return http.get(
-        Uri.parse('$apiBaseUrl/progress'),
-        headers: {
-          'Content-Type': 'application/json',
-          'auth-token': 'Bearer $token',
-        },
-      );
-    }
+    final response = await http.get(
+      Uri.parse('$apiBaseUrl/progress'),
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': 'Bearer $token',
+      },
+    );
 
-    var response = await makeRequest(token);
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Manhwa.fromJson(json)).toList();
-    }
-
-    // Try refresh once if failed
-    await refreshAuthToken();
-    token = await getAuthToken();
-    if (token == null) throw Exception("Token refresh failed");
-
-    response = await makeRequest(token);
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => Manhwa.fromJson(json)).toList();
@@ -200,12 +164,12 @@ Future<List<Manhwa>> fetchUserProgress({
       throw Exception('Progress fetch failed: status ${response.statusCode}');
     }
   } catch (e) {
-    foundation.debugPrint("Progress API failed: $e");
+    debugPrint("Progress API failed: $e");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       onFallback?.call("Failed to load your library.");
     });
 
-    return []; // safe default
+    return [];
   }
 }
 
@@ -215,36 +179,22 @@ Future<bool> submitProgress({
   required String readingStatus,
 }) async {
   try {
-    // First try using existing token
-    String? token = await getAuthToken();
+    final token = session?.accessToken;
     if (token == null) throw Exception("Missing auth token");
 
-    // Helper function to send the POST request
-    Future<http.Response> sendRequest(String token) {
-      return http.post(
-        Uri.parse('$apiBaseUrl/progress'),
-        headers: {
-          'Content-Type': 'application/json',
-          'auth-token': 'Bearer $token', // no Bearer
-        },
-        body: jsonEncode({
-          'manhwa_id': manhwaId,
-          'current_chapter': chapter,
-          'reading_status': readingStatus,
-        }),
-      );
-    }
+    final response = await http.post(
+      Uri.parse('$apiBaseUrl/progress'),
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'manhwa_id': manhwaId,
+        'current_chapter': chapter,
+        'reading_status': readingStatus,
+      }),
+    );
 
-    // First try
-    var response = await sendRequest(token);
-    if (response.statusCode == 200) return true;
-
-    // Try refresh once if failed
-    await refreshAuthToken();
-    token = await getAuthToken();
-    if (token == null) throw Exception("Token refresh failed");
-
-    response = await sendRequest(token);
     return response.statusCode == 200;
   } catch (e) {
     debugPrint("Progress update failed: $e");
@@ -254,30 +204,17 @@ Future<bool> submitProgress({
 
 Future<bool> deleteProgress(int manhwaId) async {
   try {
-    String? token = await getAuthToken();
+    final token = session?.accessToken;
     if (token == null) throw Exception("Missing auth token");
 
-    // Helper function to send the POST request
-    Future<http.Response> sendRequest(String token) {
-      return http.delete(
-        Uri.parse('$apiBaseUrl/progress/$manhwaId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'auth-token': 'Bearer $token',
-        },
-      );
-    }
+    final response = await http.delete(
+      Uri.parse('$apiBaseUrl/progress/$manhwaId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': 'Bearer $token',
+      },
+    );
 
-    // First try
-    var response = await sendRequest(token);
-    if (response.statusCode == 200) return true;
-
-    // Try refresh once if failed
-    await refreshAuthToken();
-    token = await getAuthToken();
-    if (token == null) throw Exception("Token refresh failed");
-
-    response = await sendRequest(token);
     return response.statusCode == 200;
   } catch (e) {
     debugPrint("Progress delete failed: $e");

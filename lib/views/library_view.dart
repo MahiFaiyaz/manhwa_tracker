@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:manhwa_tracker/dialog/loading_screen.dart';
 import '../services/auth_services.dart';
 import 'login_signup_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/manhwa.dart';
 import '../services/api_services.dart';
 import '../widgets/manhwa_card.dart';
 import 'dart:async';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LibraryView extends StatefulWidget {
   const LibraryView({super.key});
@@ -79,9 +79,10 @@ class LibraryViewState extends State<LibraryView> {
   }
 
   Future<void> _loadUserEmail() async {
-    final prefs = await SharedPreferences.getInstance();
+    final user = Supabase.instance.client.auth.currentUser;
+    final email = user?.email;
     setState(() {
-      userEmail = prefs.getString('user_email');
+      userEmail = email;
     });
   }
 
@@ -315,18 +316,13 @@ class LibraryViewState extends State<LibraryView> {
                   context: context,
                   text: 'Logging out...',
                 );
-                await logoutUser();
+                await Supabase.instance.client.auth.signOut();
                 LoadingScreen.instance().hide();
                 if (mounted) {
                   setState(() => _isLoggedIn = false);
                   _showSnackBar("Logged out successfully.");
                 }
               }
-              // } else if (value == 'auth_token') {
-              //   print('Token: ${await getAuthToken()}');
-              // } else if (value == 'refresh_token') {
-              //   print('refresh token: ${await getRefreshToken()}');
-              // }
             },
             itemBuilder:
                 (context) => [

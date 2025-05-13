@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_services.dart';
 import '../dialog/loading_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginSignupView extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -19,6 +20,53 @@ class _LoginSignupViewState extends State<LoginSignupView> {
   String? passwordValidationMessage;
   bool isPasswordValid = false;
   bool isEmailValid = false;
+
+  Future<void> _showPasswordResetDialog() async {
+    final controller = TextEditingController();
+    final supabase = Supabase.instance.client;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Reset Password"),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(labelText: "Enter your email"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = controller.text.trim();
+                Navigator.pop(context); // close dialog
+                LoadingScreen.instance().show(
+                  context: context,
+                  text: "Sending reset email...",
+                );
+                try {
+                  await supabase.auth.resetPasswordForEmail(
+                    email,
+                    redirectTo: "https://yourapp.com/reset", // <- update this!
+                  );
+                  _showSnackBar("Check your inbox to reset your password.");
+                } catch (e) {
+                  _showSnackBar("Failed to send reset email.");
+                } finally {
+                  LoadingScreen.instance().hide();
+                }
+              },
+              child: const Text("Send"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   bool isValidEmail(String email) {
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
@@ -51,9 +99,8 @@ class _LoginSignupViewState extends State<LoginSignupView> {
   Future<void> submit() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
-    void onError(String msg) {
-      setState(() => message = msg);
-    }
+    final supabase = Supabase.instance.client;
+    setState(() => message = null);
 
     if (!isLogin) {
       final validationMessage = validatePassword(password);
@@ -68,28 +115,31 @@ class _LoginSignupViewState extends State<LoginSignupView> {
       text: isLogin ? 'Logging in...' : 'Signing up...',
     );
 
-    final success =
-        isLogin
-            ? await loginUser(
-              email: email,
-              password: password,
-              onError: onError,
-            )
-            : await signUpUser(
-              email: email,
-              password: password,
-              onError: onError,
-            );
+    try {
+      final authResponse =
+          isLogin
+              ? await supabase.auth.signInWithPassword(
+                email: email,
+                password: password,
+              )
+              : await supabase.auth.signUp(email: email, password: password);
 
-    LoadingScreen.instance().hide();
+      LoadingScreen.instance().hide();
 
-    if (success && mounted) {
-      setState(() => message = "Success!");
-      if (isLogin) {
-        widget.onLoginSuccess?.call(); // delegate navigation
+      if (authResponse.session != null && authResponse.user != null) {
+        if (!mounted) return;
+        widget.onLoginSuccess?.call();
       } else {
-        _showSnackBar("Please verify email.");
+        setState(
+          () => message = "Please check your email to verify your account.",
+        );
       }
+    } on AuthException catch (e) {
+      LoadingScreen.instance().hide();
+      setState(() => message = e.message);
+    } catch (e) {
+      LoadingScreen.instance().hide();
+      setState(() => message = "Unexpected error: $e");
     }
   }
 
@@ -164,6 +214,14 @@ class _LoginSignupViewState extends State<LoginSignupView> {
                     }
                   },
                 ),
+                if (isLogin)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _showPasswordResetDialog,
+                      child: const Text("Forgot Password?"),
+                    ),
+                  ),
                 if (!isLogin && passwordValidationMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
