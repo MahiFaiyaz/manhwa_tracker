@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_view.dart';
 import 'library_view.dart';
 import 'all_manhwas_view.dart';
+import '../services/auth_services.dart';
 
 class RootView extends StatefulWidget {
   const RootView({super.key});
@@ -34,7 +35,7 @@ class _RootViewState extends State<RootView> {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) {
-            if (index == 0 && _currentIndex != 0) {
+            if (index == 0 && _currentIndex != 0 && currentUser != null) {
               // Refresh the library view when navigating to it
               _libraryKey.currentState?.refreshLibrary();
             }

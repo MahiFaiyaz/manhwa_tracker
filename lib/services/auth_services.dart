@@ -1,6 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-final session = Supabase.instance.client.auth.currentSession;
+SupabaseClient get supabase => Supabase.instance.client;
+
+Session? get session => supabase.auth.currentSession;
+User? get currentUser => Supabase.instance.client.auth.currentUser;
 
 Future<bool> isUserLoggedIn() async {
   final user = Supabase.instance.client.auth.currentUser;
