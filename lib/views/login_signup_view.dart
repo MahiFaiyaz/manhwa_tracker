@@ -41,13 +41,6 @@ class _LoginSignupViewState extends State<LoginSignupView> {
     return null;
   }
 
-  void _showSnackBar(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
   Future<void> submit() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
