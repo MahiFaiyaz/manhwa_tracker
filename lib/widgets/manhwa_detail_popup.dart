@@ -178,74 +178,76 @@ class _ManhwaDetailPopupState extends State<ManhwaDetailPopup> {
             actions: [
               Row(
                 children: [
-                  TextButton(
-                    onPressed: () async {
-                      final confirmed = await showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.black.withAlpha(
-                              (0.8 * 255).toInt(),
-                            ),
-                            title: const Text(
-                              "Delete Progress",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            content: const Text(
-                              "Are you sure you want to delete this from your library?",
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text("Cancel"),
+                  if (localManhwa.readingStatus != 'not_read')
+                    TextButton(
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              backgroundColor: Colors.black.withAlpha(
+                                (0.8 * 255).toInt(),
                               ),
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                child: const Text("Delete"),
+                              title: const Text(
+                                "Delete Progress",
+                                style: TextStyle(color: Colors.white),
                               ),
-                            ],
-                          );
-                        },
-                      );
+                              content: const Text(
+                                "Are you sure you want to delete this from your library?",
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.pop(context, false),
+                                  child: const Text("Cancel"),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text("Delete"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
 
-                      if (confirmed != true) return; // cancel
+                        if (confirmed != true) return; // cancel
 
-                      LoadingScreen.instance().show(
-                        context: context,
-                        text: "Deleting progress...",
-                      );
-                      final success = await deleteProgress(localManhwa.id);
+                        LoadingScreen.instance().show(
+                          context: context,
+                          text: "Deleting progress...",
+                        );
+                        final success = await deleteProgress(localManhwa.id);
 
-                      if (success) {
-                        setState(() {
-                          localManhwa = localManhwa.copyWith(
-                            readingStatus: 'not_read',
-                            currentChapter: 0,
-                          );
-                        });
-                        LoadingScreen.instance().hide();
-                        if (context.mounted) {
-                          Navigator.pop(context, {
-                            'readingStatus': readingStatus,
-                            'currentChapter': currentChapter,
+                        if (success) {
+                          setState(() {
+                            localManhwa = localManhwa.copyWith(
+                              readingStatus: 'not_read',
+                              currentChapter: 0,
+                            );
                           });
+                          LoadingScreen.instance().hide();
+                          if (context.mounted) {
+                            Navigator.pop(context, {
+                              'readingStatus': readingStatus,
+                              'currentChapter': currentChapter,
+                            });
+                          }
+                          onSave(localManhwa);
+                        } else {
+                          LoadingScreen.instance().hide();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Failed to delete progress"),
+                              ),
+                            );
+                          }
                         }
-                        onSave(localManhwa);
-                      } else {
-                        LoadingScreen.instance().hide();
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Failed to delete progress"),
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    style: TextButton.styleFrom(foregroundColor: Colors.red),
-                    child: const Text("Delete"),
-                  ),
+                      },
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      child: const Text("Delete"),
+                    ),
                   const Spacer(),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
