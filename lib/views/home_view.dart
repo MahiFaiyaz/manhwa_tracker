@@ -119,7 +119,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manhwa Finder')),
+      appBar: AppBar(title: const Text('Manhwa Tracker')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
