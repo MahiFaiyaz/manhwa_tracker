@@ -20,53 +20,6 @@ class _LoginSignupViewState extends State<LoginSignupView> {
   bool isPasswordValid = false;
   bool isEmailValid = false;
 
-  Future<void> _showPasswordResetDialog() async {
-    final controller = TextEditingController();
-    final supabase = Supabase.instance.client;
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Reset Password"),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(labelText: "Enter your email"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final email = controller.text.trim();
-                Navigator.pop(context); // close dialog
-                LoadingScreen.instance().show(
-                  context: context,
-                  text: "Sending reset email...",
-                );
-                try {
-                  await supabase.auth.resetPasswordForEmail(
-                    email,
-                    redirectTo: "https://yourapp.com/reset", // <- update this!
-                  );
-                  _showSnackBar("Check your inbox to reset your password.");
-                } catch (e) {
-                  _showSnackBar("Failed to send reset email.");
-                } finally {
-                  LoadingScreen.instance().hide();
-                }
-              },
-              child: const Text("Send"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   bool isValidEmail(String email) {
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     return emailRegex.hasMatch(email);
@@ -213,14 +166,6 @@ class _LoginSignupViewState extends State<LoginSignupView> {
                     }
                   },
                 ),
-                if (isLogin)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _showPasswordResetDialog,
-                      child: const Text("Forgot Password?"),
-                    ),
-                  ),
                 if (!isLogin && passwordValidationMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
